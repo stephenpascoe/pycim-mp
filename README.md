@@ -1,4 +1,4 @@
-[ES-DOC pycim_mp](http://www.esrl.noaa.gov/cog/es-doc/) - Metafor CIM Python Meta-Programming Utility
+[ES-DOC pycim_mp](http://www.esrl.noaa.gov/cog/es-doc/) - CIM Python Meta-Programming Utility
 ==================================================
 
 What is ES-DOC ?
