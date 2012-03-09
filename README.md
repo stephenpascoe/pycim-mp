@@ -15,6 +15,7 @@ What is pycim-mp ?
 --------------------------------------
 
 pycim-mp is a CIM meta-progamming utility written in python.  It is an essential part of the CIM eco-system of tools & services that allows developers to work with CIM metadata in the encoding of their choice and in the programming language of their choice.
+
 pycim-mp achieves this by forward engineering code based upon a pythonic representation of the CIM schema.
 
 Why pycim-mp ?
