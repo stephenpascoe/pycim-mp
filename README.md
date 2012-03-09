@@ -14,14 +14,17 @@ Metafor was a European project tasked with defining a metadata standard for desc
 What is pycim-mp ?
 --------------------------------------
 
-pycim-mp is a CIM meta-progamming utility written in python.  It is an essential part of the CIM eco-system of tools & services that allows developers to work with CIM metadata in the encoding of their choice and in the programming language of their choice.
+pycim-mp is an extensible CIM meta-progamming utility written in python.  It is an essential part of the CIM eco-system of tools & services that allows developers to work with CIM metadata in the encoding of their choice and in the programming language of their choice.
 
-pycim-mp achieves this by forward engineering code based upon a pythonic representation of the CIM schema.
+pycim-mp achieves this by parsing a pythonic representation of the CIM schema(s) and generating code in various programming languages.
+
 
 Why pycim-mp ?
 --------------------------------------
 
-CIM metadata is typically encoded in an xml format that is complex in structure and large  in size.  jscim resolves these issues and allows 3rd parties to effortlessly integrate CIM metadata into their websites.
+CIM metadata is typically encoded in an xml format that is complex in structure and large  in size.  Working with this xml directly is highly inefficient in terms of developer productivity.
+
+It was clear that this issue could only be resolved by radically simplifying deserialisation of CIM metadata so that developers could work with plain objects in the programming language of their choice.
 
 Who uses jscim ?
 --------------------------------------
