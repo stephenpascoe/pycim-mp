@@ -1,0 +1,27 @@
+"""A set of {ontology-name} {ontology-version} decoding packages.
+
+CIM CODE GENERATOR :: Code generated @ {datetime-now}.
+"""
+
+# Module imports.
+from lxml import etree as et
+
+from cim.core.cim_exception import CIMException
+from cim.core.decoding.cim_decoder_xml_utils import get_cim_xml
+from cim.core.decoding.cim_decoder_xml_utils import decode_xml
+{module-imports}
+
+# Module exports.
+__all__ = [{module-exports}]
+
+
+# Module provenance info.
+__author__="{out-author}"
+__copyright__ = "{out-copyright}"
+__date__ ="{datetime-now}"
+__license__ = "{out-license}"
+__version__ = "{out-version}"
+__maintainer__ = "{out-maintainer}"
+__email__ = "{out-maintainer-email}"
+__status__ = "{out-status}"
+

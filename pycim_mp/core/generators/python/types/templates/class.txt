@@ -1,0 +1,48 @@
+"""A class within {ontology-name} v{ontology-version} type system.
+
+CIM CODE GENERATOR :: Code generated @ {datetime-now}.
+"""
+
+# Module imports.
+import datetime
+import simplejson
+import types
+import uuid
+
+{class-imports}
+
+# Module exports.
+__all__ = ['{class-name}']
+
+
+# Module provenance info.
+__author__="{out-author}"
+__copyright__ = "{out-copyright}"
+__date__ ="${datetime-now}$"
+__license__ = "{out-license}"
+__version__ = "{out-version}"
+__maintainer__ = "{out-maintainer}"
+__email__ = "{out-maintainer-email}"
+__status__ = "{out-status}"
+
+
+
+class {class-name}({base-class-name}):
+    """A class within the {ontology-name} v{ontology-version} type system.
+
+    {class-doc-string}
+    """
+    def __init__(self):
+        """Constructor"""
+        super({class-name}, self).__init__()
+
+{class-ctor}
+{class-properties}
+{class-representations}
+
+# Command line entry point.
+if __name__ == "__main__":
+    try:
+        i = {class-name}()
+    except Exception as e:
+        print "CIM INSTANTIATION EXCEPTION !!! :: TYPE = {0} : ERROR = {1}.".format('{package-name}.{class-name}', e)

@@ -1,0 +1,16 @@
+    @property
+    def {property-name}(self):
+        """Gets value of {class-name} {property-name} property.{property-doc-string}"""
+        return {property-field}
+
+    @{property-name}.setter
+    def {property-name}(self, value):
+        if value is not None and not isinstance(value, {property-typename}):
+            raise TypeError("Invalid value type  : VALUE = {0}.".format(value))
+        """Sets value of {class-name} {property-name} property."""
+        {property-field} = value
+
+    @{property-name}.deleter
+    def {property-name}(self, value):
+        """Deletes {class-name} {property-name} property."""
+        raise TypeError("Cannot delete {class-name} {property-name} property.")

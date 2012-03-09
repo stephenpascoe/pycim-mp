@@ -1,0 +1,49 @@
+"""An abstract class within {ontology-name} v{ontology-version} type system.
+
+CIM CODE GENERATOR :: Code generated @ {datetime-now}.
+"""
+
+# Module imports.
+import abc
+from abc import ABCMeta
+from abc import abstractmethod
+from abc import abstractproperty
+import datetime
+import types
+import uuid
+
+{class-imports}
+
+# Module exports.
+__all__ = ['{class-name}']
+
+
+# Module provenance info.
+__author__="{out-author}"
+__copyright__ = "{out-copyright}"
+__date__ ="${datetime-now}$"
+__license__ = "{out-license}"
+__version__ = "{out-version}"
+__maintainer__ = "{out-maintainer}"
+__email__ = "{out-maintainer-email}"
+__status__ = "{out-status}"
+
+
+
+class {class-name}({base-class-name}):
+    """An abstract class within the {ontology-name} v{ontology-version} type system.
+
+    {class-doc-string}
+    """
+    # Abstract Base Class module - see http://docs.python.org/library/abc.html
+    __metaclass__ = ABCMeta
+
+    def __init__(self):
+        """Constructor"""
+        super({class-name}, self).__init__()
+
+{class-ctor}
+{class-properties}
+{class-representations}
+
+

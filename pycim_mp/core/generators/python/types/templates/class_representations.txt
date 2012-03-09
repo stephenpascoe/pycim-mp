@@ -1,0 +1,20 @@
+    def as_dict(self):
+        """Gets dictionary representation of self used to create other representations such as json, xml ...etc.
+
+        """
+        def append(d, key, value, is_iterative, is_primitive, is_enum):
+            if value is None:
+                if is_iterative:
+                    value = []
+            elif is_primitive == False and is_enum == False:
+                if is_iterative:
+                    value = map(lambda i : i.as_dict(), value)
+                else:
+                    value = value.as_dict()
+            d[key] = value
+
+        # Populate a deep dictionary.
+        d = dict({dict-ctor}){dict-items}
+        return d
+
+

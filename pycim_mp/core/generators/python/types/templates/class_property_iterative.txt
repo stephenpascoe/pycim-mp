@@ -1,0 +1,30 @@
+    @property
+    def {property-name}(self):
+        """Gets value of {class-name} {property-name} property.{property-doc-string}"""
+        return list({property-field})
+
+    @{property-name}.setter
+    def {property-name}(self, value):
+        """Sets value of {class-name} {property-name} property.{property-doc-string}"""
+        if not isinstance(value, types.ListType):
+            raise TypeError("value must be an iterable type.")
+        {property-field} = []
+        for i in value:
+            self.append_to_{property-name}(i)
+
+    @{property-name}.deleter
+    def {property-name}(self, value):
+        """Deletes {class-name} {property-name} property."""
+        raise TypeError("Cannot delete {class-name} {property-name} property.")
+
+    def append_to_{property-name}(self, item):
+        """Appends an item to the managed {class-name} {property-name} collection."""
+        if not isinstance(item, {property-typename}):
+            raise TypeError("item is of incorrect type.")
+        {property-field}.append(item)
+
+    def remove_from_{property-name}(self, item):
+        """Removes an item from the managed {class-name} {property-name} collection."""
+        if not isinstance(item, {property-typename}):
+            raise TypeError("item is of incorrect type.")
+        {property-field}.remove(item)

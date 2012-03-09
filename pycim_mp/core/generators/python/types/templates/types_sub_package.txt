@@ -1,0 +1,22 @@
+"""A set of {ontology-name} {ontology-version} entities.
+
+CIM CODE GENERATOR :: Code generated @ {datetime-now}.
+"""
+
+# Module imports.
+{module-imports}
+
+# Module exports.
+__all__ = [{module-exports}]
+
+
+# Module provenance info.
+__author__="{out-author}"
+__copyright__ = "{out-copyright}"
+__date__ ="{datetime-now}"
+__license__ = "{out-license}"
+__version__ = "{out-version}"
+__maintainer__ = "{out-maintainer}"
+__email__ = "{out-maintainer-email}"
+__status__ = "{out-status}"
+

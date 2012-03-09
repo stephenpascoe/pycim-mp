@@ -1,0 +1,12 @@
+def decode_{class-function-name}(xml, nsmap):
+    """Decodes a {class-doc-name} instance from xml.
+
+    Keyword arguments:
+    xml -- etree xml element from which entity is to be decoded.
+    nsmap -- set of xml namespace mappings.
+
+    """
+    decodings = [{class-decodings}
+    ]
+
+    return set_attributes({class-name}(), xml, nsmap, decodings)
