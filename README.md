@@ -1,4 +1,4 @@
-[ES-DOC pycim_mp](http://www.esrl.noaa.gov/cog/es-doc/) - CIM Python Meta-Programming Utility
+[ES-DOC pycim-mp](http://www.esrl.noaa.gov/cog/es-doc/) - CIM Python Meta-Programming Utility
 ==================================================
 
 What is ES-DOC ?
@@ -6,16 +6,16 @@ What is ES-DOC ?
 
 ES-DOC stands for Earth Science - Documentation.  It's goal is to provide software tools and services in order to support the distribution of earth science documentation.
 
-What is jscim ?
+What is the CIM ?
+--------------------------------------
+
+Metafor was a European project tasked with defining a metadata standard for describing scientific processes, particularly climate modelling processes.  This metadata standard came to be known as the CIM (Common Information Model).
+
+What is pycim-mp ?
 --------------------------------------
 
 jscim is a highly modularised javascript library built ontop of underscore, backbone & jquery.  It is designed to render & display metadata compliant with the Metafor CIM standards. 
 
-
-What is the Metafor CIM ?
---------------------------------------
-
-Metafor was a European project tasked with defining a metadata standard for describing scientific processes, particularly climate modelling processes.  This metadata standard came to be known as the CIM (Common Information Model).
 
 Why jscim ?
 --------------------------------------
