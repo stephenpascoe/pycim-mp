@@ -26,18 +26,12 @@ CIM metadata is typically encoded in an xml format that is complex in structure 
 
 It was clear that this issue could only be resolved by radically simplifying deserialisation of CIM metadata so that developers could work with plain objects in the programming language of their choice.
 
-Who uses jscim ?
+Who uses pycim-mp ?
 --------------------------------------
 
-jscim is used by several websites including:
-	1. Earth System Grid - Federation peer-to-peer web front end;
-	2. IPSL Prodiguer Portal.
-	3. KNMI Impacts portal.
+pycim-mp supports the whole of the CIM eco-system of tools and services.
 
-What are the contents of jscim ?
+What are the contents of pycim-mp ?
 --------------------------------------
 
-    \bin                Production js & css files.
-    \build              Build script for generating production files.
-    \demo\demo.xhtml    Plugin demonstration page.
-    \src                Development js & css files.
+    \pycim_mp           Source code.
