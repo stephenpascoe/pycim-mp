@@ -6,10 +6,12 @@ What is ES-DOC ?
 
 ES-DOC stands for Earth Science - Documentation.  It's goal is to provide software tools and services in order to support the distribution of earth science documentation.
 
+
 What is the CIM ?
 --------------------------------------
 
 Metafor was a European project tasked with defining a metadata standard for describing scientific processes, particularly climate modelling processes.  This metadata standard came to be known as the CIM (Common Information Model).
+
 
 What is pycim-mp ?
 --------------------------------------
@@ -26,12 +28,20 @@ CIM metadata is typically encoded in an xml format that is complex in structure 
 
 It was clear that this issue could only be resolved by radically simplifying deserialisation of CIM metadata so that developers could work with plain objects in the programming language of their choice.
 
+
 Who uses pycim-mp ?
 --------------------------------------
 
 pycim-mp supports the whole of the CIM eco-system of tools and services.
 
+
 What are the contents of pycim-mp ?
 --------------------------------------
 
     \pycim_mp           Source code.
+
+
+Further Information ?
+--------------------------------------
+
+Please refer to the wiki pages for further information.
