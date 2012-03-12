@@ -4,7 +4,8 @@
 
 # Module imports.
 from pycim_mp.core.cim_exception import CIMException
-from pycim_mp.core.generators.utils import *
+from pycim_mp.core.generators.base_generator import BaseGenerator
+from pycim_mp.core.generators.generator_utils import *
 from pycim_mp.core.generators.python.utils import *
 
 
@@ -181,7 +182,7 @@ class TypesGenerator(BaseGenerator):
 
         code = ''
         for cls in pkg.classes:
-            code += 'from {0}.v{1}.types.{2}.{3} import {4}{5}'.format(
+            code += 'from py{0}.v{1}.types.{2}.{3} import {4}{5}'.format(
                 get_ontology_name(self.ontology),
                 get_ontology_version(self.ontology),
                 get_package_name(pkg),
@@ -250,7 +251,7 @@ class TypesGenerator(BaseGenerator):
         code = inject_standard_template_params(self.ontology, self.opts, code)
         code = code.replace('{package-name}', get_package_name(pkg))
         code = code.replace('{class-name}', get_class_name(cls))
-        code = code.replace('{base-class-name}', get_base_name(cls.base))
+        code = code.replace('{base-class-name}', get_class_base_name(cls.base))
         code = code.replace('{class-doc-string}', cls.doc_string)
         code = code.replace('{class-imports}', class_imports)
         code = code.replace('{class-ctor}', class_ctor)
@@ -293,14 +294,15 @@ class TypesGenerator(BaseGenerator):
         # Initialise property fields.
         for prp in cls.properties:
             tmp = '{0} = {1}'.format(
-                get_class_property_field_name(prp),
+                get_property_field_name(prp),
                 get_property_default_value(prp),
             )
+            #print tmp
             code += '{0}{1}{2}# type = {3}{4}'.format(
                 emit_indent(2),
                 tmp,
                 ''.ljust(60 - len(tmp)),
-                get_property_type_doc_name(prp.type),
+                get_type_doc_name(prp.type),
                 emit_line_return(),
             )            
 
@@ -328,7 +330,7 @@ class TypesGenerator(BaseGenerator):
             pkg_path = get_package_path(self.ontology, 'types', package)
             type_name = get_class_name(type)
             type_import_name = get_class_import_name(type)
-            code += 'from {0}.{1} import {2}'.format(pkg_path, type_import_name, type_name)
+            code += 'from py{0}.{1} import {2}'.format(pkg_path, type_import_name, type_name)
             code += emit_line_return()
 
         return code
@@ -375,9 +377,9 @@ class TypesGenerator(BaseGenerator):
                 code = _get_template('class_property_nullable.txt')
 
         # Generate code.        
-        code = code.replace('{property-name}', get_class_property_name(prp))
-        code = code.replace('{property-field}', get_class_property_field_name(prp))
-        code = code.replace('{property-typename}', get_property_type_name(prp.type))
+        code = code.replace('{property-name}', get_property_name(prp))
+        code = code.replace('{property-field}', get_property_field_name(prp))
+        code = code.replace('{property-typename}', get_type_name(prp.type))
         code = code.replace('{property-doc-string}', doc_string)
         code = code.replace('{class-doc-name}', get_class_doc_string_name(cls))
         code += emit_line_return(3)
@@ -403,8 +405,8 @@ class TypesGenerator(BaseGenerator):
         for prp in cls.properties:
             dict_items += "{0}append(d, '{1}', {2}, {3}, {4}, {5})".format(
                 emit_line_return() + emit_indent(2),
-                get_class_property_name(prp),
-                get_class_property_field_name(prp),
+                get_property_name(prp),
+                get_property_field_name(prp),
                 prp.is_iterative,
                 prp.type.is_simple,
                 prp.type.is_enum)

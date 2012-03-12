@@ -4,7 +4,7 @@ CIM CODE GENERATOR :: Code generated @ {datetime-now}.
 """
 
 # Module imports.
-from cim.core.decoding.cim_decoder_xml_utils import *
+from pycim.core.decoding.cim_decoder_xml_utils import *
 {module-imports}
 
 # Module exports.

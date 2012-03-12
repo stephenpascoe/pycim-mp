@@ -2,7 +2,9 @@
 
 """
 # Module imports.
-from pycim_mp.core.generators.utils import *
+from operator import add
+
+from pycim_mp.core.generators.generator_utils import *
 
 
 # Module exports.
@@ -33,10 +35,10 @@ FILE_EXTENSION = '.py'
 _PACKAGE_INIT_FILE = '__init__'
 
 # Python clas property field prefix.
-_CLASS_PROPERTY_FIELD_PREFIX = 'self.__'
+_PROPERTY_FIELD_PREFIX = 'self.__'
 
 # Set of simple type mappings.
-_PRIMITIVE_TYPE_MAPPINGS = {
+_SIMPLE_TYPE_MAPPINGS = {
     'bool' : 'bool',
     'date' : 'datetime.date',
     'datetime' : 'datetime.datetime',
@@ -48,18 +50,18 @@ _PRIMITIVE_TYPE_MAPPINGS = {
 }
 
 # Primitive type null value.
-_PRIMITIVE_NULL_VALUE = 'None'
+_SIMPLE_NULL_VALUE = 'None'
 
 # Set of simple type default values.
-_PRIMITIVE_DEFAULT_VALUES = {
+_SIMPLE_DEFAULT_VALUES = {
     'bool' : 'bool()',
-    'date' : 'datetime.date(1900, 1, 1)',
-    'datetime' : 'datetime.datetime.now()',
+    'datetime.date' : 'datetime.date(1900, 1, 1)',
+    'datetime.datetime' : 'datetime.datetime.now()',
     'float' : 'float()',
     'int' : 'int()',
     'str' : 'str()',
     'uri' : 'str()',
-    'uuid' : 'uuid.uuid4()',
+    'uuid.UUID' : 'uuid.uuid4()',
 }
 
 # Iterative type default value.
@@ -68,11 +70,11 @@ _ITERATIVE_DEFAULT_VALUE = '[]'
 # Iterative type null value.
 _ITERATIVE_NULL_VALUE = '[]'
 
-# Associative type default value.
-_ASSOCIATIVE_DEFAULT_VALUE = '{0}()'
+# Complex type default value.
+_COMPLEX_DEFAULT_VALUE = '{0}()'
 
-# Associative type null value.
-_ASSOCIATIVE_NULL_VALUE = 'None'
+# Complex type null value.
+_COMPLEX_NULL_VALUE = 'None'
 
 
 def _strip(name):
@@ -84,6 +86,19 @@ def _strip(name):
     """
     if isinstance(name, str) == False:
         name = name.name
+    return name
+
+
+def _strip_class_name(name):
+    """Returns stripped class name.
+
+    Keyword Arguments:
+    name - name being converted.
+
+    """
+    name = _strip(name)
+    if name.find('.') != -1:
+        name = name.split('.')[len(name.split('.')) - 1]
     return name
 
 
@@ -113,7 +128,7 @@ def get_ontology_version(name):
     return name.replace(".", "_")
 
 
-def get_ontology_directory(self, ontology, root_dir=None, sub_dir=None, suffix_root_dir=False):
+def get_ontology_directory(ontology, root_dir=None, sub_dir=None, suffix_root_dir=False):
     """Returns ontology directory into which code is generated code.
 
     Keyword Arguments:
@@ -127,13 +142,40 @@ def get_ontology_directory(self, ontology, root_dir=None, sub_dir=None, suffix_r
     if root_dir is not None:
         dir += root_dir + '/'
     if suffix_root_dir == True:
-        dir += 'cim_codegen/'
-        dir += lang + '/'
+        dir += 'cim_codegen/python/'
         dir += get_ontology_name(ontology)
     dir += '/v' + get_ontology_version(ontology)
     if sub_dir is not None:
         dir += '/' + sub_dir
     return dir
+
+
+def get_package_name(name):
+    """Converts name to a python package name.
+
+    Keyword Arguments:
+    name - name being converted.
+
+    """
+    name = _strip_package_name(name)
+    return name
+
+
+def get_package_path(ontology, parent, package):
+    """Returns full python package name.
+
+    Keyword Arguments:
+    name - name being converted.
+
+    """
+    result = get_ontology_name(ontology)
+    result += '.v'
+    result += get_ontology_version(ontology)
+    result += '.'
+    result += get_package_name(parent)
+    result += '.'
+    result += get_package_name(package)
+    return result
 
 
 def get_package_directory(package, root_dir=None, sub_dir=None, suffix_root_dir=False):
@@ -150,19 +192,6 @@ def get_package_directory(package, root_dir=None, sub_dir=None, suffix_root_dir=
     dir += '/'
     dir += get_package_name(package)
     return dir
-
-
-def _strip_class_name(name):
-    """Returns stripped class name.
-
-    Keyword Arguments:
-    name - name being converted.
-
-    """
-    name = _strip(name)
-    if name.find('.') != -1:
-        name = name.split('.')[len(name.split('.')) - 1]
-    return name
 
 
 def get_class_name(name):
@@ -231,7 +260,7 @@ def get_class_file_name(name):
     return name + FILE_EXTENSION
 
 
-def get_base_name(name):
+def get_class_base_name(name):
     """Converts name to a python base class name.
 
     Keyword Arguments:
@@ -244,7 +273,7 @@ def get_base_name(name):
         return 'object'
 
 
-def get_class_property_name(name):
+def get_property_name(name):
     """Converts name to a python class property name.
 
     Keyword Arguments:
@@ -255,7 +284,7 @@ def get_class_property_name(name):
     return name
 
 
-def get_class_property_field_name(name):
+def get_property_field_name(name):
     """Converts name to a python class property field name.
 
     Keyword Arguments:
@@ -263,85 +292,86 @@ def get_class_property_field_name(name):
 
     """
     name = _strip(name)
-    return _CLASS_PROPERTY_FIELD_PREFIX + name
+    return _PROPERTY_FIELD_PREFIX + name
 
 
-def get_default_value(type_name, is_simple, is_iterative, is_required):
+def _get_default_value(type_name, is_simple, is_iterative, is_required):
     """Returns default type value.
 
     """
     # Iterables: convert via pre-defined mappings.
     if is_iterative:
         if is_required:
-            return get_iterative_default_value()
+            return _get_iterative_default_value()
         else:
-            return get_iterative_null_value()
-    # Primitives: convert via pre-defined mappings.
+            return _get_iterative_null_value()
+    # Simple types: convert via pre-defined mappings.
     elif is_simple:
         if is_required:
-            return get_simple_default_value(type_name)
+            return _get_simple_default_value(type_name)
         else:
-            return get_simple_null_value()
-    # Associatives: convert via pre-defined mappings.
+            return _get_simple_null_value()
+    # Complex types: convert via pre-defined mappings.
     else:
         if is_required:
-            return get_complex_default_value(type_name)
+            return _get_complex_default_value(type_name)
         else:
-            return get_complex_null_value()
+            return _get_complex_null_value()
 
 
-def get_property_default_value(prp):
+def get_property_default_value(property):
     """Returns property default value.
 
     """
-    return get_default_value(prp.type.name, prp.type.is_simple, prp.is_iterative, prp.is_required)
+    type_name = get_type_name(property.type)
+    return _get_default_value(type_name, property.type.is_simple, property.is_iterative, property.is_required)
 
 
-def get_property_type_name(ptype):
-    """Converts property name to a python property type name.
+def get_type_name(type):
+    """Returns python type name.
 
     Keyword Arguments:
-    ptype - ptype whose name is being converted.
+    type - a type declaration.
 
     """
-    name = ptype.name
-    if ptype.is_simple:
-        return get_simple_type_mapping(name)
-    elif ptype.is_enum:
-        return get_simple_type_mapping('str')
-    elif ptype.is_complex:
+    name = type.name
+    if type.is_simple:
+        return _get_simple_type_mapping(name)
+    elif type.is_enum:
+        return _get_simple_type_mapping('str')
+    elif type.is_complex:
         return get_class_name(name)
 
 
-def get_property_functional_name(ptype):
-    """Converts property name to a python property type functional name.
+def get_type_functional_name(type):
+    """Returns python type functional name.
 
     Keyword Arguments:
-    ptype - ptype whose name is being converted.
+    type - a type declaration.
 
     """
-    name = ptype.name
-    if ptype.is_simple:
+    name = type.name
+    if type.is_simple:
         return name
-    elif ptype.is_enum:
+    elif type.is_enum:
         return 'str'
-    elif ptype.is_complex:
+    elif type.is_complex:
         return get_class_name(name)
 
 
-def get_property_type_doc_name(ptype):
-    """Converts property name to a python property type documentation name.
+def get_type_doc_name(type):
+    """Returns python type documentation name.
 
     Keyword Arguments:
-    ptype - ptype whose name is being converted.
+    type - a type declaration.
 
     """
-    name = ptype.name
-    if ptype.is_simple:
-        return get_simple_type_mapping(name)
-    elif ptype.is_enum:
+    name = type.name
+    if type.is_simple:
+        return _get_simple_type_mapping(name)
+    elif type.is_enum:
         return '{0}.{1}'.format(get_package_name(name), get_enum_name(name))
-    elif ptype.is_complex:
+    elif type.is_complex:
         return '{0}.{1}'.format(get_package_name(name), get_class_name(name))
 
 
@@ -369,62 +399,62 @@ def get_enum_name(name):
     return convert_to_camel_case(name)
 
 
-def get_simple_type_mapping(simple):
+def _get_simple_type_mapping(simple):
     """Returns matching simple type mapping.
 
     Keyword Arguments:
     simple - simple type name.
 
     """
-    return _PRIMITIVE_TYPE_MAPPINGS[simple]
+    return _SIMPLE_TYPE_MAPPINGS[simple]
 
 
-def get_simple_default_value(simple):
+def _get_simple_default_value(simple):
     """Returns default value of a simple type.
 
     Keyword Arguments:
     simple - simple type name.
 
     """
-    return _PRIMITIVE_DEFAULT_VALUES[simple]
+    return _SIMPLE_DEFAULT_VALUES[simple]
 
 
-def get_simple_null_value():
+def _get_simple_null_value():
     """Returns null value of a simple type.
 
     """
-    return _PRIMITIVE_NULL_VALUE
+    return _SIMPLE_NULL_VALUE
 
 
-def get_iterative_default_value():
+def _get_iterative_default_value():
     """Returns default value of an iterative type.
 
     """
     return _ITERATIVE_DEFAULT_VALUE
 
 
-def get_iterative_null_value():
+def _get_iterative_null_value():
     """Returns null value of an iterative type.
 
     """
     return _ITERATIVE_NULL_VALUE
 
 
-def get_complex_default_value(complex):
+def _get_complex_default_value(complex):
     """Returns default value of a complex type.
 
     Keyword Arguments:
     complex - complex type name.
 
     """
-    return _ASSOCIATIVE_DEFAULT_VALUE.format(complex)
+    return _COMPLEX_DEFAULT_VALUE.format(complex)
 
 
-def get_complex_null_value():
+def _get_complex_null_value():
     """Returns null value of a complex type.
 
     """
-    return _ASSOCIATIVE_NULL_VALUE
+    return _COMPLEX_NULL_VALUE
 
 
 def _strip_package_name(name):
@@ -438,34 +468,6 @@ def _strip_package_name(name):
     if name.find('.') != -1:
         name = name.split('.')[0]
     return name
-
-
-def get_package_name(name):
-    """Converts name to a python package name.
-
-    Keyword Arguments:
-    name - name being converted.
-
-    """
-    name = _strip_package_name(name)
-    return name
-
-
-def get_package_path(ontology, parent, package):
-    """Returns full python package name.
-
-    Keyword Arguments:
-    name - name being converted.
-
-    """
-    result = get_ontology_name(ontology)
-    result += '.v'
-    result += get_ontology_version(ontology)
-    result += '.'
-    result += get_package_name(parent)
-    result += '.'
-    result += get_package_name(package)
-    return result
 
 
 def get_package_init_file_name():
@@ -487,4 +489,68 @@ def get_package_decoder_file_name(name):
     """
     name = get_package_name(name)
     return 'decoder_for_{0}_package'.format(name)
+
+
+def get_package_imports(package):
+    """Returns set of package imports.
+
+    Keyword Arguments:
+    package - package being processed.
+
+    """
+    lr = emit_line_return()
+    imports = []
+    o_name = get_ontology_name(package.ontology)
+    o_version = get_ontology_version(package.ontology)
+    p_name = get_package_name(package)
+    
+    def append_import(imp):
+        if imp not in imports:
+            imports.append(imp)
+
+    # Set package class imports.
+    for cls in package.classes:
+        imp = 'from py{0}.v{1}.types.{2}.{3} import {4}'.format(
+            o_name,
+            o_version,
+            p_name,
+            get_class_import_name(cls),
+            get_class_name(cls))
+        append_import(imp)
+
+    # Set type decoding imports.
+    for type in [t for t in package.external_types if t.is_class]:
+        imp = 'from py{0}.v{1}.decoding.{2} import {3}'.format(
+            o_name,
+            o_version,
+            get_package_decoder_file_name(type.name_of_package),
+            get_class_decoder_function_name(type))
+        append_import(imp)
+
+    if len(imports) > 0:
+        return reduce(add, map(lambda i : i + lr, sorted(imports)))
+    else:
+        return ''
+
+
+def get_package_exports(package):
+    """Returns set of package exports.
+
+    Keyword Arguments:
+    package - package being processed.
+
+    """    
+    fns = []
+    for cls in package.classes:
+        fn = get_class_decoder_function_name(cls)
+        if fn not in fns:
+            fns.append(fn)
+
+    exports = ''
+    for fn in fns:
+        if len(exports) > 0:
+            exports += ', ' + emit_line_return() + emit_indent()
+        exports += '\"{0}\"'.format(fn)
+
+    return exports
 

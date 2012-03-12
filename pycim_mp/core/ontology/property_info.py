@@ -7,8 +7,8 @@ import re
 
 from pycim_mp.core.cim_exception import CIMException
 from pycim_mp.core.ontology.type_info import TypeInfo
-from pycim_mp.core.generators.utils import convert_to_camel_case
-from pycim_mp.core.generators.utils import convert_to_pascal_case
+from pycim_mp.core.generators.generator_utils import convert_to_camel_case
+from pycim_mp.core.generators.generator_utils import convert_to_pascal_case
 
 # Module exports.
 __all__ = ['PropertyInfo']

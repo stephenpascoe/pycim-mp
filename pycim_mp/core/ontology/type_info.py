@@ -41,6 +41,7 @@ class TypeInfo(object):
         """
         # Set attributes.
         self.__complex_type = None
+        self.__is_class = False
         self.__is_enum = False
         self.__is_complex = len(name.split('.')) > 1
         self.__name = name
@@ -107,14 +108,18 @@ class TypeInfo(object):
     @property
     def is_enum(self):
         """Gets flag indicating whether type represents an enumerated type."""
-        return self.__is_complex and self.__is_enum
+        return self.__is_complex and not self.__is_class
 
 
     @property
     def is_class(self):
-        """Gets flag indicating whether type represents a complex class."""
-        return self.__is_complex and not self.__is_enum
+        """Gets flag indicating whether type represents a class."""
+        return self.__is_class
 
+    @is_class.setter
+    def is_class(self, value):
+        """Sets flag indicating whether type represents a class."""
+        self.__is_class = value
 
 
 

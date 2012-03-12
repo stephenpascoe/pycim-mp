@@ -5,7 +5,7 @@
 # Module imports.
 import re
 
-from pycim_mp.core.generators.utils import convert_to_camel_case
+from pycim_mp.core.generators.generator_utils import convert_to_camel_case
 
 
 # Module exports.

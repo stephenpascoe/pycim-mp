@@ -3,9 +3,10 @@
 """
 
 # Module imports.
-from pycim_mp.core.generators.python.utils import get_ontology_directory
-from pycim_mp.core.cim_exception import CIMException
-from pycim_mp.core.generators.utils import *
+from operator import add
+
+from pycim_mp.core.generators.base_generator import BaseGenerator
+from pycim_mp.core.generators.generator_utils import *
 from pycim_mp.core.generators.python.utils import *
 
 # Module exports.
@@ -30,7 +31,6 @@ _GEN_KEY = 'decoders'
 _GEN_LANG = 'python'
 
 
-
 def _get_template(filename):
     """Helper function to return templates.
 
@@ -46,7 +46,7 @@ class DecodersGenerator(BaseGenerator):
         """Constructor.
 
         Keyword Arguments:
-        ontology - to be parsed during course of code generation.
+        ontology - ontology from which code is generated.
         opts - code generation options.
 
         """
@@ -63,11 +63,11 @@ class DecodersGenerator(BaseGenerator):
         """
         super(DecodersGenerator, self).on_ontology_parse(ont)
 
-        # Create package directory.
+        # Create code output directory.
         dir = get_ontology_directory(ont, self.opts.out_dir, 'decoding', self.opts.out_suffix)
         create_directory(dir)
 
-        # Create package init file.
+        # Create python package init file.
         code = self.__emit_root_package_init_file()
         file = dir + '/' + get_package_init_file_name()
         write_file(code, file)
@@ -85,54 +85,6 @@ class DecodersGenerator(BaseGenerator):
         id = emit_indent()
         lr = emit_line_return()
 
-        def get_exports():
-            code = ''
-            is_first = True
-            for cls in pkg.classes:
-                if is_first == False:
-                    code += ', '
-                    code += lr
-                    code += id
-
-                fn = get_class_decoder_function_name(cls)
-                code += '\'{0}\''.format(fn)
-                is_first = False
-            return code
-
-        def get_imports():
-            code = ''
-            imports = []
-
-            def append_import(imp):
-                if imp not in imports:
-                    imports.append(imp + lr)
-
-            # Set package class imports.
-            for cls in pkg.classes:
-                imp = 'from {0}.v{1}.types.{2}.{3} import {4}'.format(
-                    get_ontology_name(self.ontology),
-                    get_ontology_version(self.ontology),
-                    get_package_name(pkg),
-                    get_class_import_name(cls),
-                    get_class_name(cls))
-                append_import(imp)
-
-            # Set type imports.
-            for type in pkg.external_types:
-                if get_package_name(type) != get_package_name(pkg):
-                    imp = 'from {0}.v{1}.decoding.{2} import {3}'.format(
-                        get_ontology_name(self.ontology),
-                        get_ontology_version(self.ontology),
-                        get_package_decoder_file_name(type),
-                        get_class_decoder_function_name(type))
-                    append_import(imp)
-
-            # Sort & emit.
-            for imp in sorted(imports):
-                code += imp
-            return code
-
-
         def get_decoder_functions():
             fns = ''
             for cls in pkg.classes:
@@ -146,19 +98,14 @@ class DecodersGenerator(BaseGenerator):
                 fns += fn
             return fns
 
-        # Set helper vars.
-        exports = get_exports()
-        imports = get_imports()
-        fns = get_decoder_functions()
-
         # Open template.
         code = _get_template('decoder.txt')
 
         # Generate code.
         code = inject_standard_template_params(self.ontology, self.opts, code)
-        code = code.replace('{module-exports}', exports)
-        code = code.replace('{module-imports}', imports)
-        code = code.replace('{decoding-functions}', fns)
+        code = code.replace('{module-exports}', get_package_exports(pkg))
+        code = code.replace('{module-imports}', get_package_imports(pkg))
+        code = code.replace('{decoding-functions}', get_decoder_functions())
 
         # Create decoder.
         file = self.__get_decoder_file_name(pkg)
@@ -191,7 +138,7 @@ class DecodersGenerator(BaseGenerator):
         def get_decoding_function():
             # ... simple/enum types - return type name as this is mapped to a convertor function.
             if prp.type.is_simple or prp.type.is_enum:
-                return '\'{0}\''.format(get_property_functional_name(prp.type))
+                return '\'{0}\''.format(get_type_functional_name(prp.type))
             # ... complex classes - return type functional name.
             elif prp.type.is_class:
                 type_name = prp.type.name if type is None else type
@@ -251,7 +198,7 @@ class DecodersGenerator(BaseGenerator):
             for e in self.ontology.entities:
                 if is_first == False:
                     imports += lr
-                imports += 'from {0}.v{1}.decoding.{2} import {3}'.format(
+                imports += 'from py{0}.v{1}.decoding.{2} import {3}'.format(
                     get_ontology_name(self.ontology),
                     get_ontology_version(self.ontology),
                     get_package_decoder_file_name(e.package),

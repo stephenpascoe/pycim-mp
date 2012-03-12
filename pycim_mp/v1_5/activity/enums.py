@@ -119,6 +119,7 @@ def _experiment_relationship_type():
 
 # Set of package enums.
 enums = [
+    _project_type(),
     _simulation_type(),
     _simulation_relationship_type(),
     _experiment_relationship_type(),

@@ -6,6 +6,8 @@
 from operator import add
 from functools import reduce
 
+from pycim_mp.core.ontology.class_info import ClassInfo
+
 
 # Module exports.
 __all__ = ['OntologyInfo']
@@ -55,7 +57,7 @@ class OntologyInfo(object):
         self.__enum_members = reduce(add, map(lambda e : e.members, self.__enums))
         self.__entities = reduce(add, map(lambda p : p.entities, packages))
         self.__properties = reduce(add, map(lambda c : c.properties, self.__classes))
-        self.__property_types = map(lambda cp : cp.type, self.__properties)
+        self.__property_types = map(lambda p : p.type, self.__properties)
         self.__types = sorted(self.__classes + self.__enums)
 
         # Set base classes.
@@ -63,6 +65,12 @@ class OntologyInfo(object):
             t = self.get_type(c.base)
             if t is not None:
                 c.base = t
+
+        # Set property type is_class flag.
+        for pt in [pt for pt in self.__property_types if pt.is_complex]:
+            t = self.get_type(pt.name)
+            if t is not None:
+                pt.is_class = isinstance(t, ClassInfo)
 
 
     def __repr__(self):

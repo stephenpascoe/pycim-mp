@@ -7,7 +7,7 @@ import optparse
 from pycim_mp.core.ontology import *
 from pycim_mp.core.ontology.utils import create_ontology
 from pycim_mp.core.ontology.utils import validate_ontology_config
-from pycim_mp.core.generators.utils import create_directory
+from pycim_mp.core.generators.generator_utils import create_directory
 from pycim_mp.core.cim_exception import CIMException
 
 
@@ -50,7 +50,7 @@ def _get_options():
     output = optparse.OptionGroup(p, "Output Options")
     output.add_option("-o", "--od","--out-dir",
                  action="store", dest="out_dir",
-                 type="string", default="/Users/markmorgan/Development/tmp/pycim",
+                 type="string", default="/Users/markmorgan/Development/sourcetree/esdoc/pycim/pycim",
                  help="Target directory into which code will be generated. [default = %default]")
     output.add_option("--osfx", "--out-suf", "--out-suffix",
                  action="store", dest="out_suffix",
@@ -88,9 +88,10 @@ def _get_options():
 
     # Parse & validate options (n.b. optparse intercepts most validation errors)..
     opts, args = p.parse_args()
+    opts.out_suffix = True if opts.out_suffix == 'true' else False
     _validate_out_dir(opts.out_dir)
 
-    print "CIM CODE-GEN :: OPTIONS : cim - {0}; languages - {1}; generators - {2}; output-directory - {3}; output-suffux - {4}; output-author - {5}; output-license - {6}; output-maintainer - {7}; output-maintainer email - {8}; output-owner - {9}; output-version - {10}; output-status - {11}.".format(
+    print "CIM CODE-GEN :: OPTIONS : cim - {0}; languages - {1}; generators - {2}; output-directory - {3}; output-suffix - {4}; output-author - {5}; output-license - {6}; output-maintainer - {7}; output-maintainer email - {8}; output-owner - {9}; output-version - {10}; output-status - {11}.".format(
         opts.cim, opts.lang, opts.generator, opts.out_dir, opts.out_suffix, opts.out_author, opts.out_license, opts.out_maintainer, opts.out_maintainer_email, opts.out_owner, opts.out_version, opts.out_status)
     return opts
 
@@ -136,8 +137,8 @@ def _get_generators(opts):
     opts - code generation options.
 
     """
-    from pycim_mp.core.generators.python.types.types_generator import TypesGenerator as PythonTypesGenerator
-    from pycim_mp.core.generators.python.decoders.decoders_generator import DecodersGenerator as PythonDecodersGenerator
+    from pycim_mp.core.generators.python.types_generator import TypesGenerator as PythonTypesGenerator
+    from pycim_mp.core.generators.python.decoders_generator import DecodersGenerator as PythonDecodersGenerator
 
     result = dict()
 
@@ -191,7 +192,7 @@ def _main():
 
 # Command line entry point.
 if __name__ == "__main__":
-    _main()
+#    _main()
     try:
         _main()
     except CIMException as e:
