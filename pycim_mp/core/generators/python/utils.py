@@ -49,8 +49,17 @@ _SIMPLE_TYPE_MAPPINGS = {
     'uuid' : 'uuid.UUID',
 }
 
-# Primitive type null value.
-_SIMPLE_NULL_VALUE = 'None'
+# Simple type null value.
+_SIMPLE_NULL_VALUES = {
+    'bool' : 'bool()',
+    'datetime.date' : 'datetime.date(1900, 1, 1)',
+    'datetime.datetime' : 'datetime.datetime.now()',
+    'float' : 'float()',
+    'int' : 'int()',
+    'str' : 'str()',
+    'uri' : 'str()',
+    'uuid.UUID' : 'uuid.uuid4()',
+}
 
 # Set of simple type default values.
 _SIMPLE_DEFAULT_VALUES = {
@@ -71,7 +80,7 @@ _ITERATIVE_DEFAULT_VALUE = '[]'
 _ITERATIVE_NULL_VALUE = '[]'
 
 # Complex type default value.
-_COMPLEX_DEFAULT_VALUE = '{0}()'
+_COMPLEX_DEFAULT_VALUE = 'None'
 
 # Complex type null value.
 _COMPLEX_NULL_VALUE = 'None'
@@ -310,13 +319,13 @@ def _get_default_value(type_name, is_simple, is_iterative, is_required):
         if is_required:
             return _get_simple_default_value(type_name)
         else:
-            return _get_simple_null_value()
+            return _get_simple_null_value(type_name)
     # Complex types: convert via pre-defined mappings.
     else:
         if is_required:
             return _get_complex_default_value(type_name)
         else:
-            return _get_complex_null_value()
+            return _get_complex_null_value(type_name)
 
 
 def get_property_default_value(property):
@@ -419,11 +428,14 @@ def _get_simple_default_value(simple):
     return _SIMPLE_DEFAULT_VALUES[simple]
 
 
-def _get_simple_null_value():
+def _get_simple_null_value(simple):
     """Returns null value of a simple type.
 
+    Keyword Arguments:
+    simple - simple type name.
+
     """
-    return _SIMPLE_NULL_VALUE
+    return _SIMPLE_NULL_VALUES[simple]
 
 
 def _get_iterative_default_value():
@@ -447,10 +459,10 @@ def _get_complex_default_value(complex):
     complex - complex type name.
 
     """
-    return _COMPLEX_DEFAULT_VALUE.format(complex)
+    return _COMPLEX_DEFAULT_VALUE
 
 
-def _get_complex_null_value():
+def _get_complex_null_value(complex):
     """Returns null value of a complex type.
 
     """
@@ -508,23 +520,19 @@ def get_package_imports(package):
         if imp not in imports:
             imports.append(imp)
 
-    # Set package class imports.
-    for cls in package.classes:
-        imp = 'from py{0}.v{1}.types.{2}.{3} import {4}'.format(
-            o_name,
-            o_version,
-            p_name,
-            get_class_import_name(cls),
-            get_class_name(cls))
-        append_import(imp)
+    # Set package class type imports.
+    imp = 'from py{0}.v{1}.types.{2} import *'.format(
+        o_name,
+        o_version,
+        p_name)
+    append_import(imp)
 
     # Set type decoding imports.
     for type in [t for t in package.external_types if t.is_class]:
-        imp = 'from py{0}.v{1}.decoding.{2} import {3}'.format(
+        imp = 'from py{0}.v{1}.decoding.{2} import *'.format(
             o_name,
             o_version,
-            get_package_decoder_file_name(type.name_of_package),
-            get_class_decoder_function_name(type))
+            get_package_decoder_file_name(type.name_of_package))
         append_import(imp)
 
     if len(imports) > 0:

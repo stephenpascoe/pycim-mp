@@ -12,7 +12,9 @@ import datetime
 import types
 import uuid
 
+# Intra/Inter-package imports.
 {class-imports}
+
 
 # Module exports.
 __all__ = ['{class-name}']
@@ -46,4 +48,9 @@ class {class-name}({base-class-name}):
 {class-properties}
 {class-representations}
 
+
+
+# Circular reference imports.
+# N.B. - see http://effbot.org/zone/import-confusion.htm.
+{class-circular-imports}
 

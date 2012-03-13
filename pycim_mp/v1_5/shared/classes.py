@@ -16,6 +16,86 @@ __email__ = "sdipsl@ipsl.jussieu.fr"
 __status__ = "Production"
 
 
+# --------------------------------------- #
+# --------  Time related classes  ------- #
+# --------------------------------------- #
+
+def _calendar():
+    """Creates and returns instance of calendar class."""
+    return {
+        'type' : 'class',
+        'name' : 'calendar',
+        'base' : None,
+        'abstract' : True,
+        'doc' : 'Describes a method of calculating a span of dates.',
+        'properties' : [
+            ('length', 'int', '0.1', None),
+            ('description', 'str', '0.1', 'Describes the finer details of the calendar, in case they are not-obvious.  For example, if an experiment has changing conditions within it (ie: 1% CO2 increase until 2100, then hold fixed for the remaining period of the  experment)'),
+            ('range', 'shared.date_range', '0.1', None),
+        ],
+        'decodings' : [
+
+        ]
+    }
+
+
+def _closed_date_range():
+    """Creates and returns instance of closed_date_range class."""
+    return {
+        'type' : 'class',
+        'name' : 'closed_date_range',
+        'base' : 'shared.date_range',
+        'abstract' : False,
+        'doc' : 'A date range with specified start and end points.',
+        'properties' : [
+            ('end', 'datetime', '0.1', 'End date is optional becuase the length of a ClosedDateRange can be calculated from the StartDate plus the Duration element.'),
+            ('start', 'datetime', '1.1', None),
+        ],
+        'decodings' : [
+            ('end', 'child::cim:endDate/text()'),
+            ('start', 'child::cim:startDate/text()'),
+        ]
+    }
+
+
+def _date_range():
+    """Creates and returns instance of date_range class."""
+    return {
+        'type' : 'class',
+        'name' : 'date_range',
+        'base' : None,
+        'abstract' : True,
+        'doc' : None,
+        'properties' : [
+            ('duration', 'str', '0.1', None),
+        ],
+        'decodings' : [
+            ('duration', 'child::cim:duration/text()'),
+        ]
+    }
+
+
+def _open_date_range():
+    """Creates and returns instance of open_date_range class."""
+    return {
+        'type' : 'class',
+        'name' : 'open_date_range',
+        'base' : 'shared.date_range',
+        'abstract' : False,
+        'doc' : 'A date range without a specified start and/or end point.',
+        'properties' : [
+            ('end', 'datetime', '0.1', None),
+            ('start', 'datetime', '0.1', None),
+        ],
+        'decodings' : [
+            ('end', 'child::cim:endDate/text()'),
+            ('start', 'child::cim:startDate/text()'),
+        ]
+    }
+
+# --------------------------------------- #
+# --------  CIM related classes  -------- #
+# --------------------------------------- #
 
 def _cim_document_relationship():
     """Creates and returns instance of cim_document_relationship class."""
@@ -72,6 +152,7 @@ def _cim_info():
             ('id', 'uuid', '1.1', 'Universally identifies the instance.'),
             ('metadata_id', 'uri', '0.1', None),
             ('metadata_version', 'str', '0.1', None),
+            ('project', 'str', '1.1', 'Name of project that instance is associated with.'),
             ('quality', 'str', '0.N', 'A (set of) quality record(s) for this document..'),
             ('status', 'shared.document_status_type', '0.1', None),
             ('version', 'str', '1.1', 'Universally identifies the instance version.'),
@@ -167,6 +248,9 @@ def _cim_relationship():
         ]
     }
 
+# --------------------------------------- #
+# --------  Other classes        -------- #
+# --------------------------------------- #
 
 def _citation():
     """Creates and returns instance of citation class."""
@@ -393,19 +477,23 @@ def _responsible_party_contact_info():
 
 # Set of package classes.
 classes = [
-        _cim_info(),
+        _calendar(),
         _cim_document_relationship(),
         _cim_document_relationship_target(),
         _cim_genealogy(),
+        _cim_info(),
         _cim_reference(),
         _cim_relationship(),
         _cim_type_info(),
         _citation(),
+        _closed_date_range(),
         _compiler(),
         _data_source(),
+        _date_range(),
         _license(),
         _machine(),
         _machine_compiler_unit(),
+        _open_date_range(),
         _platform(),
         _property(),
         _responsible_party(),

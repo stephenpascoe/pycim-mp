@@ -72,6 +72,33 @@ class OntologyInfo(object):
             if t is not None:
                 pt.is_class = isinstance(t, ClassInfo)
 
+        # Set class imports.
+        def append_to_class_imports(cls, package, type):
+            if package != cls.package.name or \
+               type != cls.name and \
+               (package, type) not in cls.imports:
+                cls.imports.append((package, type))
+        
+        for cls in self.__classes:
+            if cls.base is not None:
+                package = cls.base.package.name
+                type = cls.base.name
+                append_to_class_imports(cls, package, type)
+
+            for prp in [p for p in cls.properties if p.type.is_complex]:
+                package = prp.type.name_of_package
+                type = prp.type.name_of_type
+                append_to_class_imports(cls, package, type)
+
+        # Set class circular imports.
+        for cls in self.__classes:
+            cls_import = (cls.package.name, cls.name)
+            for prp in [p for p in cls.properties if p.type.is_class]:
+                prp_type = self.get_type(prp.type.name)
+                if cls_import in prp_type.imports:
+                    prp_type.imports.remove(cls_import)
+                    prp_type.circular_imports.append(cls_import)
+    
 
     def __repr__(self):
         """String representation for debugging."""

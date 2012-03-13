@@ -237,7 +237,8 @@ class TypesGenerator(BaseGenerator):
         """
         # Set helper vars.
         class_ctor = self.__emit_class_ctor(pkg, cls)
-        class_imports = self.__emit_class_imports(pkg, cls)
+        class_imports = self.__emit_class_imports(cls.imports)
+        class_circular_imports = self.__emit_class_imports(cls.circular_imports)
         class_properties = self.__emit_properties(pkg, cls)
         class_representations = self.__emit_class_representations(pkg, cls)
 
@@ -254,6 +255,7 @@ class TypesGenerator(BaseGenerator):
         code = code.replace('{base-class-name}', get_class_base_name(cls.base))
         code = code.replace('{class-doc-string}', cls.doc_string)
         code = code.replace('{class-imports}', class_imports)
+        code = code.replace('{class-circular-imports}', class_circular_imports)
         code = code.replace('{class-ctor}', class_ctor)
         code = code.replace('{class-properties}', class_properties)
         code = code.replace('{class-representations}', class_representations)
@@ -313,12 +315,11 @@ class TypesGenerator(BaseGenerator):
         return code
 
 
-    def __emit_class_imports(self, pkg, cls):
+    def __emit_class_imports(self, imports):
         """Emits code corresponding to a set of python class imports.
 
         Keyword Arguments:
-        pkg - package being parsed.
-        cls - class being parsed.
+        imports - imports being parsed.
 
         """
         from pycim_mp.core.ontology.class_info import ClassInfo
@@ -326,7 +327,7 @@ class TypesGenerator(BaseGenerator):
 
         code = ''
 
-        for package, type in cls.get_imports():
+        for package, type in imports:
             pkg_path = get_package_path(self.ontology, 'types', package)
             type_name = get_class_name(type)
             type_import_name = get_class_import_name(type)

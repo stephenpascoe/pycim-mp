@@ -124,14 +124,18 @@ def _numerical_experiment():
             ('description', 'str', '0.1', 'A free-text description of the experiment.'),
             ('experiment_id', 'str', '0.1', 'An experiment ID takes the form <number>.<number>[-<letter>].'),
             ('long_name', 'str', '0.1', 'The name of the experiment (that is recognized externally).'),
+            ('requirements', 'activity.numerical_requirement', '0.N', 'The name of the experiment (that is used internally).'),
             ('short_name', 'str', '1.1', 'The name of the experiment (that is used internally).'),
-
         ],
         'decodings' : [
             ('cim_info', 'self::cim:numericalExperiment'),
             ('description', 'child::cim:description/text()'),
             ('experiment_id', 'child::cim:experimentID/text()'),
             ('long_name', 'child::cim:longName/text()'),
+            ('requirements', 'child::cim:numericalRequirement/cim:initialCondition', 'activity.initial_condition'),
+            ('requirements', 'child::cim:numericalRequirement/cim:boundaryCondition', 'activity.boundary_condition'),
+            ('requirements', 'child::cim:numericalRequirement/cim:spatioTemporalConstraint', 'activity.spatio_temporal_constraint'),
+            ('requirements', 'child::cim:numericalRequirement/cim:outputRequirement', 'activity.output_requirement'),
             ('short_name', 'child::cim:shortName/text()'),
         ]
     }
@@ -149,13 +153,13 @@ def _numerical_requirement():
             ('description', 'str', '0.1', None),
             ('id', 'str', '0.1', None),
             ('name', 'str', '1.1', None),
-            ('requirement_options', 'str', '0.N', None),
-
+            ('options', 'activity.requirement_option', '0.N', None),
         ],
         'decodings' : [
             ('description', 'child::cim:description/text()'),
             ('id', 'child::cim:id/text()'),
             ('name', 'child::cim:name/text()'),
+            ('options', 'child::cim:requirementOption'),
         ]
     }
     
@@ -190,6 +194,65 @@ def _initial_condition():
         ],
         'decodings' : [
 
+        ]
+    }
+
+
+def _spatio_temporal_constraint():
+    """Creates and returns instance of spatio_temporal_constraint class."""
+    return {
+        'type' : 'class',
+        'name' : 'spatio_temporal_constraint',
+        'base' : 'activity.numerical_requirement',
+        'abstract' : False,
+        'doc' : 'Contains a set of relationship types specific to a simulation document that can be used to describe its genealogy.',
+        'properties' : [
+            ('date_range', 'shared.date_range', '0.1', None),
+            ('spatial_resolution', 'activity.resolution_type', '0.1', None),
+        ],
+        'decodings' : [
+            ('date_range', 'child::cim:requiredDuration/cim:closedDateRange', 'shared.closed_date_range'),
+            ('date_range', 'child::cim:requiredDuration/cim:openDateRange', 'shared.open_date_range'),
+            ('spatial_resolution', 'child::cim:spatialResolution/text()'),
+        ]
+    }
+
+
+def _output_requirement():
+    """Creates and returns instance of output_requirement class."""
+    return {
+        'type' : 'class',
+        'name' : 'output_requirement',
+        'base' : 'activity.numerical_requirement',
+        'abstract' : False,
+        'doc' : 'Contains a set of relationship types specific to a simulation document that can be used to describe its genealogy.',
+        'properties' : [
+
+        ],
+        'decodings' : [
+
+        ]
+    }
+
+
+def _requirement_option():
+    """Creates and returns instance of requirement_option class."""
+    return {
+        'type' : 'class',
+        'name' : 'requirement_option',
+        'base' : None,
+        'abstract' : False,
+        'doc' : 'A NumericalRequirement that is being used as a set of related requirements; For example if a requirement is to use 1 of 3 boundary conditions, then that "parent" requirement would have three "child" RequirmentOptions (each of one with the XOR optionRelationship).',
+        'properties' : [
+            ('requirement', 'activity.numerical_requirement', '0.1', 'The requirement being specified by this option'),
+            ('relationship', 'str', '0.1', 'Describes how this optional (child) requirement is related to its sibling requirements.  For example, a NumericalRequirement could consist of a set of optional requirements each with an "OR" relationship meaning use this boundary condition _or_ that one.'),
+        ],
+        'decodings' : [
+            ('requirement', 'child::cim:requirement/cim:requirement/cim:initialCondition', 'activity.initial_condition'),
+            ('requirement', 'child::cim:requirement/cim:requirement/cim:spatioTemporalConstraint', 'activity.output_requirement'),
+            ('requirement', 'child::cim:requirement/cim:requirement/cim:outputRequirement', 'activity.spatio_temporal_constraint'),
+            ('requirement', 'child::cim:requirement/cim:requirement/cim:boundaryCondition', 'activity.boundary_condition'),
+            ('relationship', 'self::cim:requirementOption/@optionRelationship'),
         ]
     }
 
@@ -234,6 +297,7 @@ def _simulation_relationship_target():
 # Set of package classes.
 classes = [
     _activity(),
+    _boundary_condition(),
     _experiment(),
     _experiment_relationship(),
     _experiment_relationship_target(),
@@ -241,6 +305,9 @@ classes = [
     _measurement_campaign(),
     _numerical_experiment(),
     _numerical_requirement(),
+    _output_requirement(),
+    _requirement_option(),
     _simulation_relationship(),
     _simulation_relationship_target(),
+    _spatio_temporal_constraint(),
 ]

@@ -120,7 +120,7 @@ class DecodersGenerator(BaseGenerator):
 
         """
         code = ''
-        for p in cls.get_properties():
+        for p in cls.all_properties:
             for dc in cls.get_property_decodings(p):
                 code += self.__emit_decoding(p, dc.decoding, dc.type)
         return code

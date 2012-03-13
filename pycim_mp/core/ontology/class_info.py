@@ -48,9 +48,10 @@ class ClassInfo(object):
         self.__all_decodings = None
         self.__all_properties = None
         self.__base = base
+        self.__circular_imports = []
         self.__decodings = sorted(decodings, key=lambda dc: dc.property_name)
         self.__doc_string = doc_string if doc_string is not None else ''
-        self.__imports = None
+        self.__imports = []
         self.__is_abstract = is_abstract
         self.__is_entity = False
         self.__name = name
@@ -80,7 +81,7 @@ class ClassInfo(object):
     @base.setter
     def base(self, value):
         """Sets associated base type."""
-        self.__base = value
+        self.__base = value        
 
 
     @property
@@ -102,6 +103,28 @@ class ClassInfo(object):
 
 
     @property
+    def all_properties(self):
+        """Gets all associated properties including those of base class (sorted by name)."""
+        if self.__all_properties is None:
+            self.__all_properties = list(self.properties)
+            if self.base is not None:
+                self.__all_properties += self.base.all_properties
+        return self.__all_properties
+
+
+    @property
+    def imports(self):
+        """Gets associated imports."""
+        return self.__imports
+
+
+    @property
+    def circular_imports(self):
+        """Gets associated circular imports."""
+        return self.__circular_imports
+
+
+    @property
     def doc_string(self):
         """Gets class documentation string."""
         return self.__doc_string
@@ -111,6 +134,16 @@ class ClassInfo(object):
     def decodings(self):
         """Gets class decodings."""
         return self.__decodings
+
+
+    @property
+    def all_decodings(self):
+        """Gets class plus base class decodings."""
+        if self.__all_decodings is None:
+            self.__all_decodings = list(self.decodings)
+            if self.base is not None:
+                self.__all_decodings += self.base.all_decodings
+        return self.__all_decodings
 
 
     @property
@@ -130,24 +163,6 @@ class ClassInfo(object):
         self.__package = value
 
 
-    def get_properties(self):
-        """Gets superset of class properties (including base class properties)."""
-        if self.__all_properties is None:
-            self.__all_properties = list(self.properties)
-            if self.base is not None:
-                self.__all_properties += self.base.get_properties()
-        return self.__all_properties
-
-
-    def get_decodings(self):
-        """Gets superset of class decodings (including base class decodings)."""
-        if self.__all_decodings is None:
-            self.__all_decodings = list(self.decodings)
-            if self.base is not None:
-                self.__all_decodings += self.base.get_decodings()
-        return self.__all_decodings
-
-
     def get_property_decodings(self, prp):
         """Returns set of property decodings.
 
@@ -156,40 +171,9 @@ class ClassInfo(object):
 
         """
         result = []
-        for dc in [dc for dc in self.get_decodings() if dc.property_name == prp.name]:
+        for dc in [dc for dc in self.all_decodings if dc.property_name == prp.name]:
             result.append(dc)
         return result
-
-
-    def get_imports(self):
-        """Returns set of imported complex classes plus base class (if specified).
-
-        """
-        def append_to_imports(imports, package, type):
-            if package != self.package.name or \
-               type != self.name and \
-               (package, type) not in imports:
-                imports.append((package, type))
-
-        if self.__imports is None:
-            imports = []
-
-            # Complex properties.
-            for p in [p for p in self.properties if p.type.is_complex]:
-                package = p.type.name_of_package
-                type = p.type.name_of_type
-                append_to_imports(imports, package, type)
-
-            # Base class.
-            if self.base is not None:
-                package = self.base.package.name
-                type = self.base.name
-                append_to_imports(imports, package, type)
-
-            # Sort.
-            self.__imports = sorted(imports)
-
-        return self.__imports
 
 
     def has_property(self, property_name):

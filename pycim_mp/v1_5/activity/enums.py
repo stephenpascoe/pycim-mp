@@ -27,6 +27,17 @@ def _project_type():
     }
 
 
+def _project_type():
+    """Creates and returns instance of resolution_type enum."""
+    return {
+        'type' : 'enum',
+        'name' : 'resolution_type',
+        'is_open' : True,
+        'doc' : None,
+        'members' : [],
+    }    
+
+
 def _simulation_type():
     """Creates and returns instance of simulation_type enum."""
     return {
