@@ -398,6 +398,7 @@ def _platform():
         'abstract' : False,
         'doc' : 'A platform is a description of resources used to deploy a component/simulation.  A platform pairs a machine with a (set of) compilers.  There is also a point of contact for the platform.',
         'properties' : [
+            ('cim_info', 'shared.cim_info', '1.1', None),
             ('contact', 'shared.responsible_party', '0.N', None),
             ('description', 'str', '0.1', None),
             ('long_name', 'str', '0.1', None),
@@ -405,7 +406,10 @@ def _platform():
             ('unit', 'shared.machine_compiler_unit', '0.1', None),
         ],
         'decodings' : [
-
+            ('cim_info', 'self::cim:platform'),
+            ('description', 'child::cim:description/text()'),
+            ('long_name', 'child::cim:longName/text()'),
+            ('short_name', 'child::cim:shortName/text()'),
         ]
     }
     

@@ -34,8 +34,59 @@ def _activity():
             ('rationales', 'child::cim:rationale/text()'),
         ]
     }
+
+
+def _conformance():
+    """Creates and returns instance of conformance class."""
+    return {
+        'type' : 'class',
+        'name' : 'conformance',
+        'base' : None,
+        'abstract' : False,
+        'doc' : 'A conformance class maps how a configured model component met a specific numerical requirement.  For example, for a double CO2 boundary condition, a model component might read a CO2 dataset in which CO2 has been doubled, or it might modify a parameterisation (presumably with a factor of two somewhere).  So, the conformance links a requirement to a DataSource (which can be either an actual DataObject or a property of a model component).  In some cases a model/simulation may _naturally_ conform to a requirement.  In this case there would be no reference to a DataSource but the conformant attribute would be true.  If something is purpopsefully non-conformant then the conformant attribute would be false.',
+        'properties' : [
+
+        ],
+        'decodings' : [
+
+        ]
+    }
     
 
+def _ensemble():
+    """Creates and returns instance of ensemble class."""
+    return {
+        'type' : 'class',
+        'name' : 'ensemble',
+        'base' : 'activity.numerical_activity',
+        'abstract' : False,
+        'doc' : 'An ensemble is made up of two or more simulations which are to be compared against each other to create ensemble statistics. Ensemble members can differ in terms of initial conditions, physical parameterisation and the model used. An ensemble bundles together sets of ensembleMembers, all of which reference the same Simulation(Run) and include one or more changes.',
+        'properties' : [
+            ('cim_info', 'shared.cim_info', '1.1', None),
+        ],
+        'decodings' : [
+            ('cim_info', 'self::cim:ensemble'),
+        ]
+    }
+
+
+def _ensemble_member():
+    """Creates and returns instance of ensemble_member class."""
+    return {
+        'type' : 'class',
+        'name' : 'ensemble_member',
+        'base' : 'activity.numerical_activity',
+        'abstract' : False,
+        'doc' : 'A simulation is the implementation of a numerical experiment.  A simulation can be made up of "child" simulations aggregated together to form a "simulation composite".  The "parent" simulation can be made up of whole or partial child simulations, the simulation attributes need to be able to capture this.',
+        'properties' : [
+
+        ],
+        'decodings' : [
+
+        ]
+    }
+
+    
 def _experiment():
     """Creates and returns instance of experiment class."""
     return {
@@ -107,6 +158,27 @@ def _measurement_campaign():
         ],
         'decodings' : [
 
+        ]
+    }
+
+
+def _numerical_activity():
+    """Creates and returns instance of numerical_activity class."""
+    return {
+        'type' : 'class',
+        'name' : 'numerical_activity',
+        'base' : 'activity.activity',
+        'abstract' : True,
+        'doc' : '',
+        'properties' : [
+            ('description', 'str', '0.1', 'A free-text description of the experiment.'),
+            ('long_name', 'str', '0.1', 'The name of the experiment (that is recognized externally).'),
+            ('short_name', 'str', '1.1', 'The name of the experiment (that is used internally).'),
+        ],
+        'decodings' : [
+            ('description', 'child::cim:description/text()'),
+            ('long_name', 'child::cim:longName/text()'),
+            ('short_name', 'child::cim:shortName/text()'),
         ]
     }
 
@@ -257,6 +329,40 @@ def _requirement_option():
     }
 
 
+def _simulation():
+    """Creates and returns instance of simulation class."""
+    return {
+        'type' : 'class',
+        'name' : 'simulation',
+        'base' : 'activity.numerical_activity',
+        'abstract' : True,
+        'doc' : 'A simulation is the implementation of a numerical experiment.  A simulation can be made up of "child" simulations aggregated together to form a "simulation composite".  The "parent" simulation can be made up of whole or partial child simulations, the simulation attributes need to be able to capture this.',
+        'properties' : [
+
+        ],
+        'decodings' : [
+
+        ]
+    }
+
+
+def _simulation_composite():
+    """Creates and returns instance of simulation_composite class."""
+    return {
+        'type' : 'class',
+        'name' : 'simulation_composite',
+        'base' : 'activity.simulation',
+        'abstract' : False,
+        'doc' : 'A SimulationComposite is an aggregation of Simulaitons. With the aggreation connector between Simulation and SimulationComposite(SC) the SC can be made up of both SimulationRuns and SCs. The SimulationComposite is the new name for the concept of SimulationCollection: A simulation can be made up of "child" simulations aggregated together to form a "simulation composite".  The "parent" simulation can be made up of whole or partial child simulations and the SimulationComposite attributes need to be able to capture this.',
+        'properties' : [
+            ('cim_info', 'shared.cim_info', '1.1', None),
+        ],
+        'decodings' : [
+            ('cim_info', 'self::cim:simulationComposite'),
+        ]
+    }
+
+
 def _simulation_relationship():
     """Creates and returns instance of simulation_relationship class."""
     return {
@@ -293,21 +399,44 @@ def _simulation_relationship_target():
     }
 
 
+def _simulation_run():
+    """Creates and returns instance of simulation_run class."""
+    return {
+        'type' : 'class',
+        'name' : 'simulation_run',
+        'base' : 'activity.simulation',
+        'abstract' : False,
+        'doc' : 'A SimulationRun is, as the name implies, one single model run. A SimulationRun is a Simulation. There is a one to one association between SimulationRun and (a top-level) SoftwarePackage::ModelComponent.',
+        'properties' : [
+            ('cim_info', 'shared.cim_info', '1.1', None),        
+        ],
+        'decodings' : [
+            ('cim_info', 'self::cim:simulationRun'),
+        ]
+    }
+
 
 # Set of package classes.
 classes = [
     _activity(),
     _boundary_condition(),
+    _conformance(),
+    _ensemble(),
+    _ensemble_member(),
     _experiment(),
     _experiment_relationship(),
     _experiment_relationship_target(),
     _initial_condition(),
     _measurement_campaign(),
+    _numerical_activity(),
     _numerical_experiment(),
     _numerical_requirement(),
     _output_requirement(),
     _requirement_option(),
+    _simulation(),
+    _simulation_composite(),
     _simulation_relationship(),
     _simulation_relationship_target(),
+    _simulation_run(),
     _spatio_temporal_constraint(),
 ]
