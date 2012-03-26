@@ -160,17 +160,6 @@ def _operating_system_type():
     }
 
 
-def _standard_name():
-    """Creates and returns instance of standard_name enum."""
-    return {
-        'type' : 'enum',
-        'name' : 'standard_name',
-        'is_open' : True,
-        'doc' : 'Describes a name given to an entity from a recognised standard.  The CIM records the standard and the name.  For example, the standard might be "CF" and the name might be "atmospheric_pressure".',
-        'members' : [ ],
-    }
-
-
 def _processor_type():
     """Creates and returns instance of processor_type enum."""
     return {
@@ -206,7 +195,6 @@ enums = [
     _machine_vendor_type(),
     _operating_system_type(),
     _processor_type(),
-    _standard_name(),
     _unit_type(),
 ]
 

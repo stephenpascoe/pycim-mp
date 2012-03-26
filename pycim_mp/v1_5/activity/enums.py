@@ -17,16 +17,18 @@ __status__ = "Production"
 
 
 def _conformance_type():
-    """Creates and returns instance of simulation_type enum."""
+    """Creates and returns instance of conformance_type enum."""
     return {
         'type' : 'enum',
         'name' : 'conformance_type',
         'is_open' : False,
         'doc' : None,
         'members' : [
-            ('simulationRun', None),
-            ('assimilation', None),
-            ('simulationComposite', None),
+            ('not conformant', 'Describes a simulation that is purpefully non-conformant to an experimental requirement.'),
+            ('standard config', 'Describes a simulation that is "naturally" conformant to an experimental requirement.'),
+            ('via inputs', 'Describes a simulation that conforms to an experimental requirement by using particular inputs.'),
+            ('via model mods', 'Describes a simulation that conforms to an experimental requirement by changing the configuration of the software model implementing that simulation.'),
+            ('combination', 'Describes a simulation that conforms to an experimental requirement by using more than one method.'),
         ],
     }
 

@@ -182,15 +182,20 @@ def _deployment():
         'properties' : [
             ('deployment_date', 'datetime', '0.1', None),
             ('description', 'str', '0.1', None),
-            # TODO define type
-            ('parallelisation', 'str', '0.1', None),
-            # TODO define type
-            ('platform', 'str', '0.1', 'The platform that this deployment has been run on. It is optional to allow for "unconfigured" models, that nonetheless specify their parallelisation constraints (a feature needed by OASIS).'),
+            ('parallelisation', 'software.parallelisation', '0.1', None),
+            ('platform', 'shared.platform', '0.1', 'The platform that this deployment has been run on. It is optional to allow for "unconfigured" models, that nonetheless specify their parallelisation constraints (a feature needed by OASIS).'),
+            ('platform_reference', 'shared.cim_reference', '0.1', None),
             ('executable_name', 'str', '0.1', None),
-            ('executable_argument', 'str', '0.N', None),
+            ('executable_arguments', 'str', '0.N', None),
         ],
         'decodings' : [
-
+            ('deployment_date', 'child::cim:deploymentDate/text()'),
+            ('description', 'child::cim:description/text()'),            
+            ('parallelisation', 'child::cim:parallelisation'),
+            ('platform', 'child::cim:platform/cim:platform'),
+            ('platform_reference', 'child::cim:platform/cim:reference'),
+            ('executable_name', 'child::cim:executableName/text()'),
+            ('executable_arguments', 'child::cim:executableArgument/text()'),
         ]
     }
 
@@ -247,7 +252,8 @@ def _parallelisation():
             ('ranks', 'software.rank', '0.N', None),
         ],
         'decodings' : [
-
+            ('processes', 'child::cim:processes/text()'),
+            ('ranks', 'child::cim:rank'),
         ]
     }
 
@@ -284,7 +290,10 @@ def _rank():
             ('increment', 'int', '0.1', None),
         ],
         'decodings' : [
-
+            ('value', 'child::cim:rankValue'),
+            ('min', 'child::cim:rankMin'),
+            ('max', 'child::cim:rankMax'),
+            ('increment', 'child::cim:rankIncrement'),
         ]
     }
 

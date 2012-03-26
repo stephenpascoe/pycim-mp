@@ -147,7 +147,7 @@ def _cim_info():
         'properties' : [
             ('author', 'shared.responsible_party', '0.1', 'Universally identifies the CIM instance'),
             ('create_date', 'datetime', '1.1', 'The date the instance was created'),
-            ('external_id', 'shared.standard_name', '0.N', 'The id of this instance as referenced by an external body (ie: DOI, or even IPSL)'),
+            ('external_ids', 'shared.standard_name', '0.N', 'A non-CIM (non-GUID) id used to reference the element in question.'),
             ('genealogy', 'shared.cim_genealogy', '0.1', 'Specifies the relationship of this document with another document. Various relationship types (depending on the type of document; ie: simulation, component, etc.) are supported.'),
             ('id', 'uuid', '1.1', 'Universally identifies the instance.'),
             ('metadata_id', 'uri', '0.1', None),
@@ -161,9 +161,10 @@ def _cim_info():
         'decodings' : [
             ('author', 'child::cim:documentAuthor'),
             ('create_date', 'child::cim:documentCreationDate/text()'),
+            ('external_ids', 'child::cim:externalID'),
+            ('genealogy', 'child::cim:documentGenealogy'),
             ('id', 'child::cim:documentID/text()'),
             ('version', 'child::cim:documentVersion/text()'),
-            ('genealogy', 'child::cim:documentGenealogy'),
         ]
     }
 
@@ -479,6 +480,49 @@ def _responsible_party_contact_info():
     }
 
 
+def _standard():
+    """Creates and returns instance of standard class."""
+    return {
+        'type' : 'class',
+        'name' : 'standard',
+        'base' : None,
+        'abstract' : False,
+        'doc' : 'Describes a name given to an entity from a recognised standard.  The CIM records the standard and the name.  For example, the standard might be CF and the name might be atmospheric_pressure.',
+        'properties' : [
+            ('name', 'str', '1.1', 'The name of the standard'),
+            ('version', 'str', '0.1', 'The version of the standard'),
+            ('description', 'str', '0.1', 'The version of the standard'),
+
+        ],
+        'decodings' : [
+            ('name', 'child::cim:name/text()'),
+            ('version', 'child::cim:version/text()'),
+            ('description', 'child::cim:description/text()'),
+        ]
+    }
+
+
+def _standard_name():
+    """Creates and returns instance of standard_name class."""
+    return {
+        'type' : 'class',
+        'name' : 'standard_name',
+        'base' : None,
+        'abstract' : False,
+        'doc' : 'Describes a name given to an entity from a recognised standard.  The CIM records the standard and the name.  For example, the standard might be CF and the name might be atmospheric_pressure.',
+        'properties' : [
+            ('is_open', 'bool', '1.1', None),
+            ('value', 'str', '1.1', None),
+            ('standards', 'shared.standard', '0.N', 'Details of the standard being used.'),
+        ],
+        'decodings' : [
+            ('is_open', '@open'),
+            ('value', '@value'),
+            ('standards', 'child::cim:standard'),
+        ]
+    }
+
+
 # Set of package classes.
 classes = [
         _calendar(),
@@ -502,5 +546,7 @@ classes = [
         _property(),
         _responsible_party(),
         _responsible_party_contact_info(),
+        _standard(),
+        _standard_name(),
 ]
 

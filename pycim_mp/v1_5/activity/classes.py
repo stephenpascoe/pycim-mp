@@ -25,13 +25,16 @@ def _activity():
         'abstract' : True,
         'doc' : 'An abstract class used as the parent of MeasurementCampaigns, Projects, Experiments, and NumericalActivities.',
         'properties' : [
-            ('responsible_parties', 'shared.responsible_party', '0.N', 'The point of contact(s) for this activity.This includes, among others, the principle investigator.'),
             ('funding_sources', 'str', '0.N', 'The entities that funded this activity.'),
-            ('rationales', 'str', '0.N', 'For what purpose is this activity being performed?'),
             ('projects', 'activity.project_type', '0.N', 'The project(s) that this activity is associated with (ie: CMIP5, AMIP, etc).'),
+            ('rationales', 'str', '0.N', 'For what purpose is this activity being performed?'),
+            ('responsible_parties', 'shared.responsible_party', '0.N', 'The point of contact(s) for this activity.This includes, among others, the principle investigator.'),
         ],
         'decodings' : [
+            ('funding_sources', 'child::cim:fundingSource/text()'),
+            ('projects', 'child::cim:project/@value'),
             ('rationales', 'child::cim:rationale/text()'),
+            ('responsible_parties', 'child::cim:responsibleParty'),
         ]
     }
 
@@ -45,10 +48,31 @@ def _conformance():
         'abstract' : False,
         'doc' : 'A conformance class maps how a configured model component met a specific numerical requirement.  For example, for a double CO2 boundary condition, a model component might read a CO2 dataset in which CO2 has been doubled, or it might modify a parameterisation (presumably with a factor of two somewhere).  So, the conformance links a requirement to a DataSource (which can be either an actual DataObject or a property of a model component).  In some cases a model/simulation may _naturally_ conform to a requirement.  In this case there would be no reference to a DataSource but the conformant attribute would be true.  If something is purpopsefully non-conformant then the conformant attribute would be false.',
         'properties' : [
-
+            ('description', 'str', '0.1', None),
+            ('frequency', 'activity.frequency_type', '0.1', None),
+            ('is_conformant', 'bool', '1.1', 'Records whether or not this conformance satisfies the requirement.  A simulation should have at least one conformance mapping to every experimental requirement.  If a simulation satisfies the requirement - the usual case - then conformant should have a value of true.  If conformant is true but there is no reference to a source for the conformance, then we can assume that the simulation conforms to the requirement _naturally_, that is without having to modify code or inputs. If a simulation does not conform to a requirement then conformant should be set to false.'),
+            ('requirements', 'activity.numerical_requirement', '0.N', 'Points to the NumericalRequirement that the simulation in question is conforming to.'),
+            ('requirement_references', 'shared.cim_reference', '0.N', None),
+            ('sources', 'shared.data_source', '0.N', 'Points to the DataSource used to conform to a particular Requirement.   This may be part of an activity::simulation or a software::component.  It can be either a DataObject or a SoftwareComponent or a ComponentProperty.  It could also be by using particular attributes of, say, a SoftwareComponent, but in that case the recommended practise is to reference the component and add appropriate text in the conformance description attribute.'),
+            ('source_references', 'shared.cim_reference', '0.N', None),
+            ('type', 'activity.conformance_type', '0.1', 'Describes the method that this simulation conforms to an experimental requirement (in case it is not specified by the change property of the reference to the source of this conformance)'),
         ],
         'decodings' : [
-
+            ('description', 'child::cim:description'),
+            ('frequency', 'child::cim:frequency'),
+            ('is_conformant', 'self::@conformant'),
+            ('requirements', 'child::cim:requirement/cim:requirement/cim:initialCondition', 'activity.initial_condition'),
+            ('requirements', 'child::cim:requirement/cim:requirement/cim:boundaryCondition', 'activity.boundary_condition'),
+            ('requirements', 'child::cim:requirement/cim:requirement/cim:spatioTemporalConstraint', 'activity.spatio_temporal_constraint'),
+            ('requirements', 'child::cim:requirement/cim:requirement/cim:outputRequirement', 'activity.output_requirement'),
+            ('requirement_references', 'child::cim:requirement/cim:reference'),
+            ('sources', 'child::cim:source/cim:source/cim:dataObject', 'data.data_object'),
+            ('sources', 'child::cim:source/cim:source/cim:dataContent', 'data.data_content'),
+            ('sources', 'child::cim:source/cim:source/cim:componentProperty', 'software.component_property'),
+            ('sources', 'child::cim:source/cim:source/cim:softwareComponent', 'software.model_component'),
+            ('sources', 'child::cim:source/cim:source/cim:softwareComponent', 'software.processor_component'),
+            ('source_references', 'child::cim:source/cim:reference'),
+            ('type', 'self::@type'),
         ]
     }
     
@@ -94,11 +118,16 @@ def _experiment():
         'name' : 'experiment',
         'base' : 'activity.activity',
         'abstract' : True,
-        'doc' : 'An abstract class used as the parent of MeasurementCampaigns, Projects, Experiments, and NumericalActivities.',
+        'doc' : 'An experiment might be an activity which is both observational and numerical in focus, for example, a measurement campaign and numerical experiments for an alpine experiment.  It is a place for the scientific description of the reason why an experiment was made.',
         'properties' : [
             ('measurement_campaigns', 'activity.measurement_campaign', '0.N', None),
-            ('requires', 'activity.measurement_campaign', '0.N', None),
-            ('generates', 'activity.measurement_campaign', '0.N', None),
+            ('requires', 'activity.numerical_activity', '0.N', None),
+            ('requires_references', 'shared.cim_reference', '0.N', None),
+            ('generates', 'str', '0.N', None),
+            ('supports', 'str', '1.N', None),
+#            ('generates', 'activity.numerical_experiment', '0.N', None),
+#            ('supports', 'activity.experiment', '1.N', None),
+            ('supports_references', 'shared.cim_reference', '0.N', None),
         ],
         'decodings' : [
 
@@ -307,6 +336,23 @@ def _output_requirement():
     }
 
 
+def _physical_modification():
+    """Creates and returns instance of physical_modification class."""
+    return {
+        'type' : 'class',
+        'name' : 'physical_modification',
+        'base' : 'activity.conformance',
+        'abstract' : False,
+        'doc' : 'Physical modification is the implementation of a boundary condition numerical requirement that is achieved within the model code rather than from some external source file. It  might include, for example,  a specific rate constant within a chemical reaction, or coefficient value(s) in a parameterisation.  For example, one might require a numerical experiment where specific chemical reactions were turned off - e.g. no heterogeneous chemistry.',
+        'properties' : [
+
+        ],
+        'decodings' : [
+
+        ]
+    }
+
+
 def _requirement_option():
     """Creates and returns instance of requirement_option class."""
     return {
@@ -336,12 +382,32 @@ def _simulation():
         'name' : 'simulation',
         'base' : 'activity.numerical_activity',
         'abstract' : True,
-        'doc' : 'A simulation is the implementation of a numerical experiment.  A simulation can be made up of "child" simulations aggregated together to form a "simulation composite".  The "parent" simulation can be made up of whole or partial child simulations, the simulation attributes need to be able to capture this.',
+        'doc' : 'A simulation is the implementation of a numerical experiment.  A simulation can be made up of "child" simulations aggregated together to form a simulation composite.  The parent simulation can be made up of whole or partial child simulations, the simulation attributes need to be able to capture this.',
         'properties' : [
-
+            ('authors', 'str', '0.1', 'List of associated authors.'),
+            # TODO implement : Daily-360 | RealCalendar | PerpetualPeriod
+            ('calendar', 'str', '1.1', None),
+            ('control_simulation', 'activity.simulation', '0.1', 'Points to a simulation being used as the basis (control) run.  Note that only "derived" simulations can describe something as being control; a simulation should not know if it is being used itself as the control of some other run.'),
+            ('control_simulation_reference', 'shared.cim_reference', '0.1', None),
+            # TODO implement: Conformance | PhysicalModification
+            ('conformances', 'activity.conformance', '0.N', None),
+            ('deployments', 'software.deployment', '0.N', None),
+            # TODO implement: Coupling
+            ('inputs', 'str', '0.N', 'Implemented as a mapping from a source to target; can be a forcing file, a boundary condition, etc.'),
+            ('outputs', 'data.data_object', '0.N', None),
+            ('output_references', 'shared.cim_reference', '0.N', None),
+            ('restarts', 'data.data_object', '0.N', None),
+            ('restart_references', 'shared.cim_reference', '0.N', None),
+            ('simulation_id', 'str', '0.1', None),
+            ('spinup_date_range', 'shared.closed_date_range', '0.1', 'The date range that a simulation is engaged in spinup.'),
+            ('spinup_simulation', 'activity.simulation', '0.1', 'The (external) simulation used during "spinup."  Note that this element can be used in conjuntion with spinupDateRange.  If a simulation has the latter but not the former, then one can assume that the simulation is performing its own spinup.'),
+            ('spinup_simulation_reference', 'shared.cim_reference', '0.1', None),
         ],
         'decodings' : [
-
+            ('authors', 'child::cim:authorsList/cim:list/text()'),
+            ('conformances', 'child::cim:authorsList/cim:list/text()'),
+            ('deployments', 'child::cim:deployment'),
+            ('simulation_id', 'child::cim:simulationID/text()'),
         ]
     }
 
@@ -353,12 +419,20 @@ def _simulation_composite():
         'name' : 'simulation_composite',
         'base' : 'activity.simulation',
         'abstract' : False,
-        'doc' : 'A SimulationComposite is an aggregation of Simulaitons. With the aggreation connector between Simulation and SimulationComposite(SC) the SC can be made up of both SimulationRuns and SCs. The SimulationComposite is the new name for the concept of SimulationCollection: A simulation can be made up of "child" simulations aggregated together to form a "simulation composite".  The "parent" simulation can be made up of whole or partial child simulations and the SimulationComposite attributes need to be able to capture this.',
+        'doc' : 'A SimulationComposite is an aggregation of Simulations. With the aggreation connector between Simulation and SimulationComposite(SC) the SC can be made up of both SimulationRuns and SCs. The SimulationComposite is the new name for the concept of SimulationCollection: A simulation can be made up of "child" simulations aggregated together to form a "simulation composite".  The "parent" simulation can be made up of whole or partial child simulations and the SimulationComposite attributes need to be able to capture this.',
         'properties' : [
             ('cim_info', 'shared.cim_info', '1.1', None),
+            ('child', 'activity.simulation', '0.N', None),
+            ('date_range', 'shared.date_range', '1.1', None),
+            ('rank', 'int', '1.1', 'Position of a simulation in the SimulationComposite timeline. eg:  Is this the first (rank = 1) or second (rank = 2) simulation'),
         ],
         'decodings' : [
-            ('cim_info', 'self::cim:simulationComposite'),
+            ('cim_info', 'self::cim:simulationRun'),
+            ('child', 'child::cim:child', 'activity.simulation_run'),
+            ('child', 'child::cim:child', 'activity.simulation_composite'),
+            ('date_range', 'child::cim:dateRange/cim:closedDateRange', 'shared.closed_date_range'),
+            ('date_range', 'child::cim:dateRange/cim:openDateRange', 'shared.open_date_range'),
+            ('rank', 'child::cim:rank/text()'),
         ]
     }
 
@@ -408,10 +482,17 @@ def _simulation_run():
         'abstract' : False,
         'doc' : 'A SimulationRun is, as the name implies, one single model run. A SimulationRun is a Simulation. There is a one to one association between SimulationRun and (a top-level) SoftwarePackage::ModelComponent.',
         'properties' : [
-            ('cim_info', 'shared.cim_info', '1.1', None),        
+            ('cim_info', 'shared.cim_info', '1.1', None),
+            ('date_range', 'shared.date_range', '1.1', None),            
+            ('model', 'software.model_component', '0.1', None),
+            ('model_reference', 'shared.cim_reference', '0.1', None),
         ],
         'decodings' : [
             ('cim_info', 'self::cim:simulationRun'),
+            ('date_range', 'child::cim:dateRange/cim:closedDateRange', 'shared.closed_date_range'),
+            ('date_range', 'child::cim:dateRange/cim:openDateRange', 'shared.open_date_range'),
+            ('model', 'child::cim:model/cim:modelComponent'),
+            ('model_reference', 'child::cim:model/cim:reference'),
         ]
     }
 
@@ -432,6 +513,7 @@ classes = [
     _numerical_experiment(),
     _numerical_requirement(),
     _output_requirement(),
+    _physical_modification(),
     _requirement_option(),
     _simulation(),
     _simulation_composite(),
