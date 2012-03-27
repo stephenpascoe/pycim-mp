@@ -64,7 +64,7 @@ class TypesGenerator(BaseGenerator):
 
         """
         super(TypesGenerator, self).on_ontology_parse(ont)
-
+        
         # Helper functions.
         def emit_imports():
             return self.__emit_imports_for_root_package()

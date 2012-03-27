@@ -52,27 +52,27 @@ def _conformance():
             ('frequency', 'activity.frequency_type', '0.1', None),
             ('is_conformant', 'bool', '1.1', 'Records whether or not this conformance satisfies the requirement.  A simulation should have at least one conformance mapping to every experimental requirement.  If a simulation satisfies the requirement - the usual case - then conformant should have a value of true.  If conformant is true but there is no reference to a source for the conformance, then we can assume that the simulation conforms to the requirement _naturally_, that is without having to modify code or inputs. If a simulation does not conform to a requirement then conformant should be set to false.'),
             ('requirements', 'activity.numerical_requirement', '0.N', 'Points to the NumericalRequirement that the simulation in question is conforming to.'),
-            ('requirement_references', 'shared.cim_reference', '0.N', None),
+            ('requirements_references', 'shared.cim_reference', '0.N', None),
             ('sources', 'shared.data_source', '0.N', 'Points to the DataSource used to conform to a particular Requirement.   This may be part of an activity::simulation or a software::component.  It can be either a DataObject or a SoftwareComponent or a ComponentProperty.  It could also be by using particular attributes of, say, a SoftwareComponent, but in that case the recommended practise is to reference the component and add appropriate text in the conformance description attribute.'),
-            ('source_references', 'shared.cim_reference', '0.N', None),
+            ('sources_references', 'shared.cim_reference', '0.N', None),
             ('type', 'activity.conformance_type', '0.1', 'Describes the method that this simulation conforms to an experimental requirement (in case it is not specified by the change property of the reference to the source of this conformance)'),
         ],
         'decodings' : [
-            ('description', 'child::cim:description'),
+            ('description', 'child::cim:description/text()'),
             ('frequency', 'child::cim:frequency'),
-            ('is_conformant', 'self::@conformant'),
+            ('is_conformant', '@conformant'),
             ('requirements', 'child::cim:requirement/cim:requirement/cim:initialCondition', 'activity.initial_condition'),
             ('requirements', 'child::cim:requirement/cim:requirement/cim:boundaryCondition', 'activity.boundary_condition'),
             ('requirements', 'child::cim:requirement/cim:requirement/cim:spatioTemporalConstraint', 'activity.spatio_temporal_constraint'),
             ('requirements', 'child::cim:requirement/cim:requirement/cim:outputRequirement', 'activity.output_requirement'),
-            ('requirement_references', 'child::cim:requirement/cim:reference'),
+            ('requirements_references', 'child::cim:requirement/cim:reference'),
             ('sources', 'child::cim:source/cim:source/cim:dataObject', 'data.data_object'),
             ('sources', 'child::cim:source/cim:source/cim:dataContent', 'data.data_content'),
             ('sources', 'child::cim:source/cim:source/cim:componentProperty', 'software.component_property'),
             ('sources', 'child::cim:source/cim:source/cim:softwareComponent', 'software.model_component'),
             ('sources', 'child::cim:source/cim:source/cim:softwareComponent', 'software.processor_component'),
-            ('source_references', 'child::cim:source/cim:reference'),
-            ('type', 'self::@type'),
+            ('sources_references', 'child::cim:source/cim:reference'),
+            ('type', '@type'),
         ]
     }
     
@@ -203,11 +203,15 @@ def _numerical_activity():
             ('description', 'str', '0.1', 'A free-text description of the experiment.'),
             ('long_name', 'str', '0.1', 'The name of the experiment (that is recognized externally).'),
             ('short_name', 'str', '1.1', 'The name of the experiment (that is used internally).'),
+            ('supports', 'activity.experiment', '1.N', None),
+            ('supports_references', 'shared.cim_reference', '1.N', None),
         ],
         'decodings' : [
             ('description', 'child::cim:description/text()'),
             ('long_name', 'child::cim:longName/text()'),
             ('short_name', 'child::cim:shortName/text()'),
+            ('supports', 'child::cim:supports/cim:experiment'),
+            ('supports_references', 'child::cim:supports/cim:reference'),
         ]
     }
 
@@ -386,14 +390,14 @@ def _simulation():
         'properties' : [
             ('authors', 'str', '0.1', 'List of associated authors.'),
             # TODO implement : Daily-360 | RealCalendar | PerpetualPeriod
-            ('calendar', 'str', '1.1', None),
+            ('calendar', 'shared.calendar', '1.1', None),
             ('control_simulation', 'activity.simulation', '0.1', 'Points to a simulation being used as the basis (control) run.  Note that only "derived" simulations can describe something as being control; a simulation should not know if it is being used itself as the control of some other run.'),
             ('control_simulation_reference', 'shared.cim_reference', '0.1', None),
             # TODO implement: Conformance | PhysicalModification
             ('conformances', 'activity.conformance', '0.N', None),
             ('deployments', 'software.deployment', '0.N', None),
             # TODO implement: Coupling
-            ('inputs', 'str', '0.N', 'Implemented as a mapping from a source to target; can be a forcing file, a boundary condition, etc.'),
+            ('inputs', 'software.coupling', '0.N', 'Implemented as a mapping from a source to target; can be a forcing file, a boundary condition, etc.'),
             ('outputs', 'data.data_object', '0.N', None),
             ('output_references', 'shared.cim_reference', '0.N', None),
             ('restarts', 'data.data_object', '0.N', None),
@@ -404,9 +408,16 @@ def _simulation():
             ('spinup_simulation_reference', 'shared.cim_reference', '0.1', None),
         ],
         'decodings' : [
+            ('calendar', 'child::cim:calendar/cim:daily-360', 'shared.daily_360'),
+            ('calendar', 'child::cim:calendar/cim:perpetualPeriod', 'shared.perpetual_period'),
+            ('calendar', 'child::cim:calendar/cim:realCalendar', 'shared.real_calendar'),
             ('authors', 'child::cim:authorsList/cim:list/text()'),
-            ('conformances', 'child::cim:authorsList/cim:list/text()'),
+            ('conformances', 'child::cim:conformance/cim:conformance', 'activity.conformance'),
+            ('conformances', 'child::cim:conformance/cim:physicalModification', 'activity.physical_modification'),
+            ('control_simulation', 'child::cim:controlSimulation/cim:controlSimulation'),
+            ('control_simulation_reference', 'child::cim:controlSimulation/cim:reference'),
             ('deployments', 'child::cim:deployment'),
+            ('inputs', 'child::cim:input'),
             ('simulation_id', 'child::cim:simulationID/text()'),
         ]
     }

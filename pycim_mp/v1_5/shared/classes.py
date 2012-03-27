@@ -29,12 +29,15 @@ def _calendar():
         'abstract' : True,
         'doc' : 'Describes a method of calculating a span of dates.',
         'properties' : [
-            ('length', 'int', '0.1', None),
             ('description', 'str', '0.1', 'Describes the finer details of the calendar, in case they are not-obvious.  For example, if an experiment has changing conditions within it (ie: 1% CO2 increase until 2100, then hold fixed for the remaining period of the  experment)'),
+            ('length', 'int', '0.1', None),
             ('range', 'shared.date_range', '0.1', None),
         ],
         'decodings' : [
-
+            ('description', 'child::cim:description/text()'),
+            ('length', 'child::cim:length/text()'),
+            ('range', 'child::cim:range/cim:closedDateRange', 'shared.closed_date_range'),
+            ('range', 'child::cim:range/cim:openDateRange', 'shared.open_date_range'),
         ]
     }
 
@@ -55,6 +58,19 @@ def _closed_date_range():
             ('end', 'child::cim:endDate/text()'),
             ('start', 'child::cim:startDate/text()'),
         ]
+    }
+
+
+def _daily_360():
+    """Creates and returns instance of daily_360 class."""
+    return {
+        'type' : 'class',
+        'name' : 'daily_360',
+        'base' : 'shared.calendar',
+        'abstract' : False,
+        'doc' : None,
+        'properties' : [ ],
+        'decodings' : [ ]
     }
 
 
@@ -390,6 +406,19 @@ def _machine_compiler_unit():
     }
 
 
+def _perpetual_period():
+    """Creates and returns instance of perpetual_period class."""
+    return {
+        'type' : 'class',
+        'name' : 'perpetual_period',
+        'base' : 'shared.calendar',
+        'abstract' : False,
+        'doc' : None,
+        'properties' : [ ],
+        'decodings' : [ ]
+    }
+
+
 def _platform():
     """Creates and returns instance of platform class."""
     return {
@@ -431,6 +460,19 @@ def _property():
             ('name', 'child::cim:name/text()'),
             ('value', 'child::cim:value/text()'),
         ]
+    }
+
+
+def _real_calendar():
+    """Creates and returns instance of real_calendar class."""
+    return {
+        'type' : 'class',
+        'name' : 'real_calendar',
+        'base' : 'shared.calendar',
+        'abstract' : False,
+        'doc' : None,
+        'properties' : [ ],
+        'decodings' : [ ]
     }
 
 
@@ -536,14 +578,17 @@ classes = [
         _citation(),
         _closed_date_range(),
         _compiler(),
+        _daily_360(),
         _data_source(),
         _date_range(),
         _license(),
         _machine(),
         _machine_compiler_unit(),
         _open_date_range(),
+        _perpetual_period(),
         _platform(),
         _property(),
+        _real_calendar(),
         _responsible_party(),
         _responsible_party_contact_info(),
         _standard(),

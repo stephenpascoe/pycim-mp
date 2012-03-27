@@ -54,7 +54,7 @@ def _get_schema():
         'class' : {
             'type' : dict,
             'fields' : {
-                'name' : (str, True, '^[a-z_]+$'),
+                'name' : (str, True, '^[a-z_0-9]+$'),
                 'base' : (str, False, '^[a-z_]+\.?[a-z_]+$'),
                 'abstract' : (bool, True, None),
                 'doc' : (str, False, None),
