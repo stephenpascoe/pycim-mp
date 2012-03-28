@@ -308,17 +308,22 @@ def _compiler():
         'name' : 'compiler',
         'base' : None,
         'abstract' : False,
-        'doc' : 'A language of a compiler used on a particular platform',
+        'doc' : 'A description of a compiler used on a particular platform.',
         'properties' : [
-            ('name', 'str', '0.1', None),
-            ('version', 'str', '0.1', None),
-            ('language', 'str', '0.1', None),
-            ('type', 'shared.compiler_type', '0.1', None),
-            ('options', 'str', '0.1', 'The set of options used during compilation (recorded here as a single string rather than separate elements)'),
             ('environment_variables', 'str', '0.1', 'The set of environment_variables used during compilation (recorded here as a single string rather than separate elements)'),
+            ('language', 'str', '0.1', None),
+            ('name', 'str', '1.1', None),
+            ('options', 'str', '0.1', 'The set of options used during compilation (recorded here as a single string rather than separate elements)'),
+            ('type', 'shared.compiler_type', '0.1', None),
+            ('version', 'str', '1.1', None),
         ],
         'decodings' : [
-
+            ('environment_variables', 'child::cim:compilerEnvironmentVariables/text()'),
+            ('language', 'child::cim:compilerLanguage/text()'),
+            ('name', 'child::cim:compilerName/text()'),
+            ('options', 'child::cim:compilerOptions/text()'),
+            ('type', 'child::cim:compilerType/text()'),
+            ('version', 'child::cim:compilerVersion/text()'),
         ]
     }
 
@@ -371,19 +376,30 @@ def _machine():
         'properties' : [
             ('cores_per_processor', 'int', '0.1', None),
             ('description', 'str', '0.1', None),
-            ('interconnect', 'str', '0.1', None),
-            ('name', 'str', '0.1', None),
+            ('interconnect', 'shared.interconnect_type', '0.1', None),
+            ('name', 'str', '1.1', None),
             ('libraries', 'str', '0.N', 'The libraries residing on this machine.'),
             ('location', 'str', '0.1', None),
             ('maximum_processors', 'int', '0.1', None),
-            ('operating_system', 'str', '0.1', None),
+            ('operating_system', 'shared.operating_system_type', '0.1', None),
             ('system', 'str', '0.1', None),
-            ('type', 'str', '0.1', None),
-            ('vendor', 'str', '0.1', None),
-            ('processor_type', 'str', '0.1', None),
+            ('type', 'shared.machine_type', '0.1', None),
+            ('vendor', 'shared.machine_vendor_type', '0.1', None),
+            ('processor_type', 'shared.processor_type', '0.1', None),
         ],
         'decodings' : [
-
+            ('cores_per_processor', 'child::cim:machineCoresPerProcessor/text()'),
+            ('description', 'child::cim:machineDescription/text()'),
+            ('interconnect', 'child::cim:machineInterconnect/@value'),
+            ('name', 'child::cim:machineName/text()'),
+            ('libraries', 'child::cim:machineLibrary'),
+            ('location', 'child::cim:machineLocation/text()'),
+            ('maximum_processors', 'child::cim:machineMaximumProcessors/text()'),
+            ('operating_system', 'child::cim:machineOperatingSystem/@value'),
+            ('system', 'child::cim:machineSystem/text()'),
+            ('type', '@machineType'),
+            ('vendor', 'child::cim:machineVendor/@value'),
+            ('processor_type', 'child::cim:machineProcessorType/@value'),
         ]
     }
 
@@ -397,11 +413,12 @@ def _machine_compiler_unit():
         'abstract' : False,
         'doc' : 'Associates a machine with a [set of] compilers.  This is a separate class in case a platform needs to specify more than one machine/compiler pair.',
         'properties' : [
-            ('compiler', 'shared.compiler', '0.N', None),
-            ('machine', 'shared.machine', '0.1', None),
+            ('compilers', 'shared.compiler', '0.N', None),
+            ('machine', 'shared.machine', '1.1', None),
         ],
         'decodings' : [
-
+            ('compilers', 'child::cim:compiler'),
+            ('machine', 'child::cim:machine'),
         ]
     }
 
@@ -429,17 +446,19 @@ def _platform():
         'doc' : 'A platform is a description of resources used to deploy a component/simulation.  A platform pairs a machine with a (set of) compilers.  There is also a point of contact for the platform.',
         'properties' : [
             ('cim_info', 'shared.cim_info', '1.1', None),
-            ('contact', 'shared.responsible_party', '0.N', None),
+            ('contacts', 'shared.responsible_party', '0.N', None),
             ('description', 'str', '0.1', None),
             ('long_name', 'str', '0.1', None),
-            ('short_name', 'str', '0.1', None),
-            ('unit', 'shared.machine_compiler_unit', '0.1', None),
+            ('short_name', 'str', '1.1', None),
+            ('units', 'shared.machine_compiler_unit', '1.N', None),
         ],
         'decodings' : [
             ('cim_info', 'self::cim:platform'),
+            ('contacts', 'child::cim:contact'),
             ('description', 'child::cim:description/text()'),
             ('long_name', 'child::cim:longName/text()'),
             ('short_name', 'child::cim:shortName/text()'),
+            ('units', 'child::cim:unit'),
         ]
     }
     
