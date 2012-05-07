@@ -332,8 +332,10 @@ def get_property_default_value(property):
     """Returns property default value.
 
     """
-    type_name = get_type_name(property.type)
-    return _get_default_value(type_name, property.type.is_simple, property.is_iterative, property.is_required)
+    return _get_default_value(get_type_name(property.type),
+                              property.type.is_simple,
+                              property.is_iterative,
+                              property.is_required)
 
 
 def get_type_name(type):

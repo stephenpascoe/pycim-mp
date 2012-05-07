@@ -357,7 +357,7 @@ def _model_component():
             ('cim_info', 'shared.cim_info', '1.1', None),
             ('types', 'software.model_component_type', '1.N', 'Describes the type of component. There can be multiple types.'),
             ('timing', 'software.timing', '0.1', 'Describes information about how this component simulates time.'),
-            ('activity', 'str', '0.1', None),
+            ('activity', 'activity.activity', '0.1', None),
         ],
         'decodings' : [
             ('cim_info', 'self::cim:modelComponent'),
@@ -448,8 +448,7 @@ def _software_component():
             ('citations', 'shared.citation', '0.N', None),
             ('online_resource', 'uri', '0.1', 'Provides a URL location for this model.'),
             ('component_language', 'software.component_language', '0.1', None),
-            # TODO define type
-            ('grid', 'str', '0.1', 'A reference to the grid that is used by this component.'),
+            ('grid', 'grids.grid_spec', '0.1', 'A reference to the grid that is used by this component.'),
             ('composition', 'software.composition', '0.1', None),
             ('child_components', 'software.software_component', '0.N', None),
             ('parent_component', 'software.software_component', '0.1', None),

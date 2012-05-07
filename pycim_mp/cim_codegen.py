@@ -50,7 +50,7 @@ def _get_options():
     output = optparse.OptionGroup(p, "Output Options")
     output.add_option("-o", "--od","--out-dir",
                  action="store", dest="out_dir",
-                 type="string", default="/Users/markmorgan/Development/sourcetree/esdoc/pycim/pycim",
+                 type="string", default="/Users/markmorgan/Development/tmp/pycim",
                  help="Target directory into which code will be generated. [default = %default]")
     output.add_option("--osfx", "--out-suf", "--out-suffix",
                  action="store", dest="out_suffix",
