@@ -150,6 +150,7 @@ def create_directory(dir):
     try:
         os.makedirs(dir)
     except:
+        #!REVIEW: Consider "except IOError"
         pass
 
 

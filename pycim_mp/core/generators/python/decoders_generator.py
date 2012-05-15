@@ -82,6 +82,7 @@ class DecodersGenerator(BaseGenerator):
         """
         super(DecodersGenerator, self).on_package_parse(pkg)
 
+        #!REVIEW: these variables are unused
         id = emit_indent()
         lr = emit_line_return()
 

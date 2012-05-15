@@ -37,7 +37,7 @@ class EnumMemberInfo(object):
         # Set attributes.
         self.__name = name
         self.__doc_string = doc_string
-
+        #!REVIEW: self.__enum not defined.
 
     def __repr__(self):
         """String representation for debugging."""

@@ -52,6 +52,7 @@ class OntologyInfo(object):
         self.__validation_error = None
 
         # Set supersets.
+        #!REVIEW: reduce() is discouraged.  It's moved to functools in Python 3.0.
         self.__classes = reduce(add, map(lambda p : p.classes, packages))
         self.__enums = reduce(add, map(lambda p : p.enums, packages))
         self.__enum_members = reduce(add, map(lambda e : e.members, self.__enums))

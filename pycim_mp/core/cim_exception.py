@@ -23,6 +23,8 @@ class CIMException(Exception):
     """
 
     def __init__(self, message):
+        #!REVIEW: no need to explain self in the docstring
+        #!REVIEW: message not documented
         """Contructor.
 
         Keyword Arguments:
@@ -33,6 +35,7 @@ class CIMException(Exception):
 
 
     def __str__(self):
+        #!REVIEW: this is not a constructor
         """Contructor.
 
         Keyword Arguments:

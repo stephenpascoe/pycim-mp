@@ -47,7 +47,7 @@ class EnumInfo(object):
         self.__is_open = is_open
         self.__doc_string = doc_string if doc_string is not None else ''
         self.__members = sorted(members, key=lambda m: m.name)
-
+        #!REVIEW: self.__package not defined.  Calling getter prior to setter will cause error.
 
     def __repr__(self):
         """String representation for debugging."""

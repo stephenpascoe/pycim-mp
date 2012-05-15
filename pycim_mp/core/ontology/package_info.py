@@ -69,6 +69,8 @@ class PackageInfo(object):
         
         # Derive superset of external types.
         for prp in self.__properties:
+            #!REVIEW: avoid using backslashes to span expressions accros lines
+            #         use parentheses when there is no other option
             if prp.type.is_complex and \
                prp.type.name_of_package != self.name and \
                prp.type not in self.__external_types:
