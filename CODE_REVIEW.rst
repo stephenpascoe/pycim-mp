@@ -1,15 +1,9 @@
-Introduction
-============
-
-TODO: introduction
-
-
 Criteria
 ========
 
 The general brief was as follows
 
-.. block-quote:
+::
 
   By code review I mean the totality of the contents of the gut hub
   repo, i.e. source-code, unit/functional tests, & wiki pages
@@ -26,9 +20,7 @@ coding standard and is primarily designed for guidance in contributing
 to the Python standard library.  As such it shouldn't be assumed that
 conformance to PEP8_ is the only acceptable way of writing well formed
 idiomatic Python.  In particular I draw your attention to the
-introductory section of PEP8 `a foolish consistency...'_ which states
-
-.. block-quote:
+introductory section of PEP8 `a foolish consistency`_ which states
 
   A style guide is about consistency. Consistency with this style guide
   is important. Consistency within a project is more
@@ -42,7 +34,7 @@ to have more constrained docstring format.
 
 .. _PEP8: http://www.python.org/dev/peps/pep-0008/
 .. _PEP257: http://www.python.org/dev/peps/pep-0257/
-.. _`a foolish consistency...`: http://www.python.org/dev/peps/pep-0008/#a-foolish-consistency-is-the-hobgoblin-of-little-minds
+.. _`a foolish consistency`: http://www.python.org/dev/peps/pep-0008/#a-foolish-consistency-is-the-hobgoblin-of-little-minds
 
 Procedure
 =========
@@ -59,7 +51,7 @@ flagged by pylint are worth highlighting.
 During my investigations I annotate the source when ever I find a
 programming construct that is a concern using this format:
 
-.. code-block: python
+::
 
    #!REVIEW: Comment on the code that follows
    #         possibly extended to multiple lines
@@ -74,13 +66,26 @@ have not analysed the source in depth.
 Summary Recommendations
 =======================
 
-My main recommendations are as follows:
+In general the source code shows a very high level of consistency and
+good coding practices.  The style is in many cases more constrained
+than is typical in idiomatic python which values readability above
+strict rules.
 
- 1. Create a ``setup.py`` file to provide a mechanism for buildint
- tarballs and to define distribution metadata
+Recommendations are given throughout the sections below and in the
+``#!REVIEW`` source annotations.  My main recommendations are as
+follows:
 
- 2. Start using the sphinx_ documentation system.
+1. Create a ``setup.py`` file to provide a mechanism for buildint
+tarballs and to define distribution metadata
 
+2. Start using the sphinx_ documentation system.
+
+3. Add module-level docstrings to improve output of python's ``pydoc``
+tool and ``help()`` function.
+
+4. Document your local coding style particularly where it varies from
+PEP8 and common Python practices.  I suggest this include the use of
+properties and instance attribute hiding.
 
 
 Code Review
@@ -131,7 +136,7 @@ For instance here is an example of formatted
 parameter declarations in declaring the
 ``pycim_mp.core.class_info.ClassInfo.__init__()`` method:
 
-.. code-block: python
+::
 
    def __init__(self, name, base, is_abstract, doc_string, properties, decodings):
         """Constructor.
@@ -200,7 +205,7 @@ mitigates this problem but I would still advise avoiding ``from
 individually and the package name is long you can define an
 abbreviation such as:
 
-.. code-block: python
+::
 
    # A common example of abbreviating a module import
    import matplotlib.pyplot as plt
@@ -225,8 +230,10 @@ standard in this area.  Authorship metadata should be present in a
 Python version compatibility
 ----------------------------
 
-Use of ``str.format()`` makes the code incompatible with Python<2.6.
-This is fine but should be stated in the packaging metadata.
+.. admonition:: Recommendation
+
+   Use of ``str.format()`` makes the code incompatible with Python<2.6.
+   This is fine but should be stated in the packaging metadata.
 
 
 
@@ -239,6 +246,7 @@ data hiding is fairly uncommon in Python source.  The
 double-underscore system is primarily intended to protect private
 instance attributes from accidental overwriting in subclasses and not to hide
 them from instance users.
+
 
 .. admonition:: Recommendation
 
